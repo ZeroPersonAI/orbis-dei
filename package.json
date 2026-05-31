@@ -4,6 +4,10 @@
   "private": true,
   "type": "module",
   "description": "Node.js server port of the Orbis Dei habitat — hosts autopoietic organisms that run a six-phase metabolic loop.",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
     "start": "tsx src/server.ts",
     "dev": "tsx watch src/server.ts",
