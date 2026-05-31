@@ -1,0 +1,28 @@
+{
+  "name": "orbis-dei-server",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Node.js server port of the Orbis Dei habitat — hosts autopoietic organisms that run a six-phase metabolic loop.",
+  "scripts": {
+    "start": "tsx src/server.ts",
+    "dev": "tsx watch src/server.ts",
+    "typecheck": "tsc --noEmit",
+    "build:web": "cd web && npm install && npm run build",
+    "setup": "npm install && npm run build:web"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.8.1",
+    "chokidar": "^4.0.3",
+    "express": "^4.21.2",
+    "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.12",
+    "@types/express": "^4.17.21",
+    "@types/node": "^22.10.5",
+    "@types/ws": "^8.5.13",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.3"
+  }
+}

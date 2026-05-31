@@ -1,0 +1,71 @@
+// Port of src-tauri/src/state.rs — the shared application state. The Tauri
+// AppHandle's roles are split here: `events` replaces `app.emit`, `db` is the
+// better-sqlite3 connection (single-threaded, no mutex needed), `secrets`
+// replaces the OS keychain.
+import * as fs from "node:fs";
+import * as path from "node:path";
+import * as os from "node:os";
+import { openDb, type DB } from "./persistence/db.ts";
+import { loadSettings } from "./persistence/settings.ts";
+import { SecretStore } from "./persistence/secrets.ts";
+import { Governor, type GovernorSettings } from "./inference/governor/index.ts";
+import { EventBus } from "./events.ts";
+import { Orchestrator } from "./core/orchestrator.ts";
+import { AutoModeManager } from "./core/autoMode.ts";
+
+export interface ViewerWatcher {
+  instanceId: string;
+  close: () => void;
+}
+
+/** Resolve the habitat data dir. Mirrors the Rust `BaseDirs::data_dir()/OrbisDei`
+ *  but allows ORBIS_DATA_DIR override (useful for the server / tests). */
+export function habitatDataDir(): string {
+  const override = process.env.ORBIS_DATA_DIR;
+  if (override && override.length > 0) return override;
+  const home = os.homedir();
+  switch (process.platform) {
+    case "darwin":
+      return path.join(home, "Library", "Application Support", "OrbisDei");
+    case "win32":
+      return path.join(process.env.APPDATA || path.join(home, "AppData", "Roaming"), "OrbisDei");
+    default:
+      return path.join(process.env.XDG_DATA_HOME || path.join(home, ".local", "share"), "OrbisDei");
+  }
+}
+
+export class AppState {
+  dataDir: string;
+  instancesDir: string;
+  db: DB;
+  governor: Governor;
+  events: EventBus;
+  secrets: SecretStore;
+  orchestrator: Orchestrator;
+  autoMode: AutoModeManager;
+  viewerWatcher: ViewerWatcher | null = null;
+
+  constructor(dataDir: string) {
+    this.dataDir = dataDir;
+    this.instancesDir = path.join(dataDir, "instances");
+    fs.mkdirSync(this.instancesDir, { recursive: true });
+
+    this.db = openDb(path.join(dataDir, "habitat.db"));
+    this.secrets = new SecretStore(dataDir);
+    this.events = new EventBus();
+
+    const s = loadSettings(this.db);
+    const govSettings: GovernorSettings = {
+      rpm: s.governor_rpm,
+      itpm: s.governor_itpm,
+      otpm: s.governor_otpm,
+      dailyBudgetUsd: s.daily_budget_usd,
+      monthlyBudgetUsd: s.monthly_budget_usd,
+      perInstanceQuotaPct: s.per_instance_quota_pct,
+    };
+    this.governor = new Governor(govSettings);
+
+    this.orchestrator = new Orchestrator(this);
+    this.autoMode = new AutoModeManager(this);
+  }
+}
