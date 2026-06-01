@@ -149,6 +149,11 @@ function phaseUserSuffix(phase: Phase, loopN: number): string {
         "`stimuli/outbox/` which is YOUR outbound channel to the " +
         "operator —, CLAUDE.md, paths with `..`). No knowledge file or " +
         "outbox file over 100 KB. Tool scripts start with a shebang.\n" +
+        "When you deposit a message in `stimuli/outbox/`, it MUST have a " +
+        "meaningful `# <title>` on the first line (never \"Untitled Message\") " +
+        "and real content beneath it — an empty or placeholder outbox file is " +
+        "wasted. If you have nothing substantive to say to the operator this " +
+        "loop, write NO outbox file at all rather than an empty one.\n" +
         "\n" +
         "3. TOOL_RUN markers — run a tool you wrote THIS loop:\n" +
         "<!-- TOOL_RUN: <path-to-the-tool> -->\n" +
