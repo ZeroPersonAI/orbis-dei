@@ -28,3 +28,7 @@ yet tag releases.
 - Pause now emits `daemon:stopped` immediately (instead of only when the
   in-flight cycle reaches a cancellation checkpoint), so the instance view's
   Pause button reacts instantly.
+- Instance view now reflects a pause everywhere immediately: the Dashboard
+  status badge re-fetches on daemon/loop transitions (not only on corpus file
+  changes), and the loop phase indicator resets to idle when the daemon stops
+  (a cooperatively-cancelled loop emits no terminal loop event).

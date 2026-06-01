@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { listen, type UnlistenFn } from "./transport";
 import {
+  DAEMON_EVENTS,
   LOOP_EVENTS,
+  type DaemonStoppedEvent,
   type LoopFailedEvent,
   type LoopResult,
   type PhaseEvent,
@@ -41,13 +43,21 @@ export function useLoopState(instanceId: string): LoopRunState {
           error: e.payload.error,
         });
       });
+      // A paused loop is cancelled cooperatively and emits no terminal loop
+      // event, so "running" would otherwise stick (green dot + active phase).
+      // When the daemon stops, fall back to idle.
+      const u4 = await listen<DaemonStoppedEvent>(DAEMON_EVENTS.stopped, (e) => {
+        if (e.payload.instance_id !== instanceId) return;
+        setState((s) => (s.kind === "running" ? { kind: "idle" } : s));
+      });
 
       if (cancelled) {
         u1();
         u2();
         u3();
+        u4();
       } else {
-        unlisteners = [u1, u2, u3];
+        unlisteners = [u1, u2, u3, u4];
       }
     }
 

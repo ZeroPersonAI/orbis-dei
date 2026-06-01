@@ -57,6 +57,15 @@ export function InstanceView({ instanceId, onBack }: Props) {
   const loopState = useLoopState(instanceId);
   const daemon = useDaemonState(instanceId, corpusTick);
 
+  // Single refresh signal for every tab. Bumps on corpus file changes AND on
+  // daemon/loop transitions — pause/play don't touch corpus files, so without
+  // this the Dashboard's status badge (read from instance.status) would not
+  // re-fetch on pause.
+  const [refreshTick, setRefreshTick] = useState(0);
+  useEffect(() => {
+    setRefreshTick((t) => t + 1);
+  }, [corpusTick, daemon.running, loopState.kind]);
+
   // Start/stop the backend corpus watcher with the viewer's lifetime.
   useEffect(() => {
     api.openInstanceViewer(instanceId).catch((e) => setError(String(e)));
@@ -194,7 +203,7 @@ export function InstanceView({ instanceId, onBack }: Props) {
         </div>
       )}
 
-      <DriftWarnings instanceId={instanceId} refreshTick={corpusTick} />
+      <DriftWarnings instanceId={instanceId} refreshTick={refreshTick} />
 
       {instance?.status === "boredom_pause" && (
         <div className="mx-6 mt-3 px-3 py-2 bg-sky-950 border border-sky-900 rounded text-sm text-sky-200">
@@ -241,39 +250,39 @@ export function InstanceView({ instanceId, onBack }: Props) {
 
       <main className="flex-1 overflow-auto border-t border-neutral-800 p-6">
         {tab === "dashboard" && (
-          <Dashboard instanceId={instanceId} refreshTick={corpusTick} />
+          <Dashboard instanceId={instanceId} refreshTick={refreshTick} />
         )}
         {tab === "messages" && (
           <Messages
             instanceId={instanceId}
-            refreshTick={corpusTick}
+            refreshTick={refreshTick}
             onReplied={refreshInstance}
           />
         )}
         {tab === "state" && (
-          <StatePanel instanceId={instanceId} refreshTick={corpusTick} />
+          <StatePanel instanceId={instanceId} refreshTick={refreshTick} />
         )}
         {tab === "episodic" && (
-          <EpisodicTimeline instanceId={instanceId} refreshTick={corpusTick} />
+          <EpisodicTimeline instanceId={instanceId} refreshTick={refreshTick} />
         )}
         {tab === "stimuli" && (
           <StimulusInbox
             instanceId={instanceId}
-            refreshTick={corpusTick}
+            refreshTick={refreshTick}
             onStimulusInjected={refreshInstance}
           />
         )}
         {tab === "observe" && <ObserveChat instanceId={instanceId} />}
         {tab === "tools" && (
-          <ToolsInventory instanceId={instanceId} refreshTick={corpusTick} />
+          <ToolsInventory instanceId={instanceId} refreshTick={refreshTick} />
         )}
         {tab === "network" && (
-          <NetworkLog instanceId={instanceId} refreshTick={corpusTick} />
+          <NetworkLog instanceId={instanceId} refreshTick={refreshTick} />
         )}
         {tab === "superinstance" && (
           <SuperinstancePanel
             instanceId={instanceId}
-            refreshTick={corpusTick}
+            refreshTick={refreshTick}
           />
         )}
         {tab === "auto_modus" && <AutoModusTab instanceId={instanceId} />}

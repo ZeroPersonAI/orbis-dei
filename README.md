@@ -4,6 +4,7 @@ A Node.js server port of the Orbis Dei habitat (originally a Tauri desktop app).
 It hosts autopoietic organisms that each run a six-phase metabolic loop
 (observe → diverge → elect → expand → review → integrate), isolated with their
 own corpus, git history, and constitution.
+Autopoiesis – a system's ability to create and sustain itself – marks the decisive shift from AI as a tool to AI as an autonomous living entity. It is the theoretical key to true AGI: a system that is organizationally closed, self-repairing, and capable of survival. Yet today's models lack the existential risk.
 
 The Rust backend was ported faithfully to TypeScript; the React frontend is
 reused almost verbatim — only its Tauri coupling layer was swapped for HTTP +
