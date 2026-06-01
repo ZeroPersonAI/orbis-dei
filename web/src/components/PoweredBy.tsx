@@ -8,7 +8,7 @@ export function PoweredBy() {
         rel="noopener noreferrer"
         className="text-[10px] tracking-wide text-neutral-600 hover:text-neutral-300 transition-colors"
       >
-        Powered by ZeroPerson LLC — zeroperson.ai
+        Built by ZeroPerson LLC — zeroperson.ai
       </a>
     </footer>
   );

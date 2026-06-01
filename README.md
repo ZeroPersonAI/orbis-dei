@@ -89,4 +89,4 @@ all configured at runtime through the Settings UI.
 
 ---
 
-Powered by [ZeroPerson LLC](https://zeroperson.ai) — zeroperson.ai
+Built by [ZeroPerson LLC](https://zeroperson.ai) — zeroperson.ai · MIT licensed.
