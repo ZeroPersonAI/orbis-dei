@@ -86,8 +86,15 @@ export function InstanceView({ instanceId, onBack }: Props) {
     refreshInstance();
   }, [refreshInstance, corpusTick, loopState.kind, daemon.running]);
 
-  const activePhase = loopState.kind === "running" ? loopState.phase : null;
   const isRunning = daemon.running || loopState.kind === "running";
+  // Prefer the live loop event; on mount (event missed) fall back to the
+  // instance's persisted current_phase while the daemon is running.
+  const activePhase =
+    loopState.kind === "running"
+      ? loopState.phase
+      : daemon.running
+        ? (instance?.current_phase ?? null)
+        : null;
 
   async function handlePlay() {
     setBusy(true);

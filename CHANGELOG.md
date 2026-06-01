@@ -32,3 +32,8 @@ yet tag releases.
   status badge re-fetches on daemon/loop transitions (not only on corpus file
   changes), and the loop phase indicator resets to idle when the daemon stops
   (a cooperatively-cancelled loop emits no terminal loop event).
+- The phase progress indicator now shows the current phase when a view is
+  opened mid-loop (e.g. card → Play → Dashboard). `instances.current_phase` is
+  kept live on each `phase_started`, and the header falls back to it instead of
+  waiting for the next phase transition (whose `phase_started` event the
+  freshly-mounted view would otherwise be the first to see).

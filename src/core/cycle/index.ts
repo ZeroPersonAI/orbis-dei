@@ -5,6 +5,7 @@ import * as fs from "node:fs";
 import * as path from "node:path";
 import type { AppState } from "../../state.ts";
 import type { Instance } from "../instance.ts";
+import { setStatusPhaseCounter } from "../instance.ts";
 import { InstancePaths, writeAtomic } from "../../persistence/fs.ts";
 import * as pgit from "../../persistence/git.ts";
 import { loadSettings } from "../../persistence/settings.ts";
@@ -140,6 +141,13 @@ async function runPhases(
       phase,
       episodic_path: null,
     });
+    // Keep instances.current_phase live so a view opened mid-loop can show the
+    // current phase immediately (the phase_started event is missed on mount).
+    try {
+      setStatusPhaseCounter(state.db, instance.id, "running", phase, loopN);
+    } catch {
+      /* status mirror is best-effort */
+    }
 
     const startedAt = new Date().toISOString();
     let outcome: PhaseOutcome | null = null;
