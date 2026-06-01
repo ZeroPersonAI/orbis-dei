@@ -1,7 +1,7 @@
 <!--
 Thanks for the PR. Keep it small if you can. If you change loop / inference /
-governor behaviour, check it against the Rust original's semantics — this is a
-faithful port and other modules parse the episodic file format as a contract.
+governor behaviour, be deliberate — other modules parse the episodic file
+format and marker strings as a contract.
 -->
 
 ## Change
