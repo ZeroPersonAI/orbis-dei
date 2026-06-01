@@ -19,6 +19,7 @@ import { NetworkLog } from "../components/NetworkLog";
 import { Dashboard } from "../components/Dashboard";
 import { Messages } from "../components/Messages";
 import { AutoModusTab } from "../components/AutoModusTab";
+import { useT } from "../lib/i18n";
 
 interface Props {
   instanceId: string;
@@ -48,6 +49,7 @@ const STATUS_COLORS: Record<string, string> = {
 };
 
 export function InstanceView({ instanceId, onBack }: Props) {
+  const { t } = useT();
   const [instance, setInstance] = useState<Instance | null>(null);
   const [tab, setTab] = useState<Tab>("dashboard");
   const [error, setError] = useState<string | null>(null);
@@ -147,14 +149,14 @@ export function InstanceView({ instanceId, onBack }: Props) {
             onClick={onBack}
             className="text-neutral-400 hover:text-neutral-100 text-sm"
           >
-            ← Back
+            ← {t("Back")}
           </button>
           <div className={`w-2 h-2 rounded-full ${dotClass}`} />
           <h1 className="text-lg font-light tracking-tight">
             {instance?.name ?? instanceId.slice(0, 8)}
           </h1>
           <span className="text-xs text-neutral-500 font-mono">
-            loop {instance?.loop_counter ?? "—"}
+            {t("loop")} {instance?.loop_counter ?? "—"}
           </span>
           <span className="text-xs text-neutral-500">
             {instance
@@ -170,7 +172,7 @@ export function InstanceView({ instanceId, onBack }: Props) {
                 disabled={busy}
                 className="px-2.5 py-1 text-[11px] bg-amber-200 text-amber-950 rounded hover:bg-amber-100 disabled:opacity-50"
               >
-                ⏸ Pause
+                ⏸ {t("Pause")}
               </button>
             ) : (
               <>
@@ -179,14 +181,14 @@ export function InstanceView({ instanceId, onBack }: Props) {
                   disabled={busy}
                   className="px-2.5 py-1 text-[11px] bg-emerald-300 text-emerald-950 rounded hover:bg-emerald-200 disabled:opacity-50"
                 >
-                  ▶ Play
+                  ▶ {t("Play")}
                 </button>
                 <button
                   onClick={handleRunOnce}
                   disabled={busy || loopState.kind === "running"}
                   className="px-2.5 py-1 text-[11px] bg-neutral-100 text-neutral-900 rounded hover:bg-white disabled:opacity-50"
                 >
-                  Run Once
+                  {t("Run Once")}
                 </button>
               </>
             )}
@@ -205,7 +207,7 @@ export function InstanceView({ instanceId, onBack }: Props) {
             onClick={() => setError(null)}
             className="text-red-300 hover:text-red-100 underline"
           >
-            dismiss
+            {t("dismiss")}
           </button>
         </div>
       )}
@@ -214,15 +216,16 @@ export function InstanceView({ instanceId, onBack }: Props) {
 
       {instance?.status === "boredom_pause" && (
         <div className="mx-6 mt-3 px-3 py-2 bg-sky-950 border border-sky-900 rounded text-sm text-sky-200">
-          {instance.loops_since_last_stimulus} Loops ohne Reiz — das System
-          fordert Stimulus an.{" "}
+          {t("{n} loops without a stimulus — the system is requesting stimulus.", {
+            n: instance.loops_since_last_stimulus,
+          })}{" "}
           <button
             onClick={() => setTab("stimuli")}
             className="underline hover:text-sky-100"
           >
-            Wirf einen Reiz ein
+            {t("Inject a stimulus")}
           </button>{" "}
-          und drücke ▶ Play, um fortzufahren.
+          {t("and press ▶ Play to continue.")}
         </div>
       )}
 
@@ -250,7 +253,7 @@ export function InstanceView({ instanceId, onBack }: Props) {
                 : "text-neutral-500 hover:text-neutral-300"
             }`}
           >
-            {label}
+            {t(label)}
           </button>
         ))}
       </nav>

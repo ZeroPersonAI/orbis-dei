@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { api } from "../lib/tauri-bindings";
+import { useT } from "../lib/i18n";
 
 interface Props {
   instanceId: string;
@@ -8,6 +9,7 @@ interface Props {
 }
 
 export function StatePanel({ instanceId, refreshTick }: Props) {
+  const { t } = useT();
   const [content, setContent] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
 
@@ -35,7 +37,7 @@ export function StatePanel({ instanceId, refreshTick }: Props) {
 
   return (
     <pre className="text-xs font-mono text-neutral-300 whitespace-pre-wrap leading-relaxed">
-      {content || "(empty)"}
+      {content || t("(empty)")}
     </pre>
   );
 }

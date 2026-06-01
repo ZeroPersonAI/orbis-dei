@@ -1,19 +1,22 @@
 import { useCallback, useEffect, useState } from "react";
 import { api, type AutoConfig } from "../lib/tauri-bindings";
+import { useT } from "../lib/i18n";
 
 interface Props {
   instanceId: string;
 }
 
-const DEFAULT_REPLY_PROMPT =
-  "Würdige echte Substanz, korrigiere sanft Fehlannahmen, führe das System " +
-  "zum Wachstum. Antworte als Operator, prägnant. Reiz, kein Befehl.";
-const DEFAULT_STIMULUS_PROMPT =
-  "Verfasse einen vorausschauenden, kreativen Reiz zum Wachstum des Systems " +
-  "Richtung AGI. Nutze ruhig Nebenthemen (Internet, Wikipedia, Wissenschaft). " +
-  "Vermeide doppelte Reize.";
-
 export function AutoModusTab({ instanceId }: Props) {
+  const { t } = useT();
+  const DEFAULT_REPLY_PROMPT = t(
+    "Honor genuine substance, gently correct misconceptions, guide the system " +
+      "toward growth. Reply as the operator, concise. A stimulus, not a command.",
+  );
+  const DEFAULT_STIMULUS_PROMPT = t(
+    "Compose a forward-looking, creative stimulus for the system's growth " +
+      "toward AGI. Feel free to use adjacent topics (internet, Wikipedia, science). " +
+      "Avoid duplicate stimuli.",
+  );
   const [config, setConfig] = useState<AutoConfig | null>(null);
   const [running, setRunning] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -46,7 +49,7 @@ export function AutoModusTab({ instanceId }: Props) {
         const saved = await api.setAutoConfig(instanceId, next);
         setConfig(saved);
         setRunning(await api.autoModeStatus(instanceId));
-        setOk("Gespeichert und angewendet.");
+        setOk(t("Saved and applied."));
       } catch (e) {
         setError(String(e));
         // re-sync from backend so the UI doesn't show an unsaved/failed state
@@ -61,7 +64,7 @@ export function AutoModusTab({ instanceId }: Props) {
   if (!config) {
     return (
       <div className="text-sm text-neutral-500">
-        {error ? `Fehler: ${error}` : "Lade Auto-Modus…"}
+        {error ? t("Error: {error}", { error }) : t("Loading auto mode…")}
       </div>
     );
   }
@@ -72,11 +75,13 @@ export function AutoModusTab({ instanceId }: Props) {
   return (
     <div className="max-w-2xl space-y-6">
       <div>
-        <h2 className="text-sm font-medium text-neutral-200">Auto-Modus</h2>
+        <h2 className="text-sm font-medium text-neutral-200">{t("Auto mode")}</h2>
         <p className="text-xs text-neutral-500 mt-1">
-          Der Operator-Agent dieser Instanz. Beantwortet Outbox-Nachrichten
-          automatisch und/oder speist in einem Intervall neue Stimuli ein.
-          Reize, keine Befehle — der Organismus entscheidet selbst.
+          {t(
+            "The operator agent of this instance. Replies to outbox messages " +
+              "automatically and/or feeds new stimuli at an interval. " +
+              "Stimuli, not commands — the organism decides for itself.",
+          )}
         </p>
       </div>
 
@@ -92,7 +97,7 @@ export function AutoModusTab({ instanceId }: Props) {
             }
             className="accent-emerald-500 w-4 h-4"
           />
-          Auto-Modus aktiv
+          {t("Auto mode active")}
         </label>
         <span
           className={`text-xs px-2 py-0.5 rounded-full ${
@@ -101,7 +106,7 @@ export function AutoModusTab({ instanceId }: Props) {
               : "bg-neutral-800 text-neutral-500"
           }`}
         >
-          {running ? "läuft" : "gestoppt"}
+          {running ? t("running") : t("stopped")}
         </span>
       </section>
 
@@ -114,15 +119,18 @@ export function AutoModusTab({ instanceId }: Props) {
             onChange={(e) => set({ auto_reply_enabled: e.target.checked })}
             className="accent-neutral-300"
           />
-          <span className="font-medium">Auto-Antwort auf Outbox-Eingänge</span>
+          <span className="font-medium">{t("Auto-reply to outbox arrivals")}</span>
         </label>
         <p className="text-xs text-neutral-500 -mt-1 ml-6">
-          Erkennt neue Nachrichten in der Outbox des Organismus und legt eine
-          generierte Antwort in die Inbox (als <code>reply_to</code>-Thread).
+          {t(
+            "Detects new messages in the organism's outbox and places a " +
+              "generated reply into the inbox (as a",
+          )}{" "}
+          <code>reply_to</code>{t("-thread).")}
         </p>
         <div className="ml-6">
           <label className="block text-xs text-neutral-400 mb-1.5">
-            Richtung der Antworten
+            {t("Direction of the replies")}
           </label>
           <textarea
             value={config.auto_reply_prompt ?? ""}
@@ -134,7 +142,7 @@ export function AutoModusTab({ instanceId }: Props) {
             rows={3}
           />
           <p className="text-[11px] text-neutral-600 mt-1">
-            Leer = Standard-Richtung.
+            {t("Empty = default direction.")}
           </p>
         </div>
       </section>
@@ -148,16 +156,17 @@ export function AutoModusTab({ instanceId }: Props) {
             onChange={(e) => set({ auto_stimulus_enabled: e.target.checked })}
             className="accent-neutral-300"
           />
-          <span className="font-medium">Auto-Stimulus im Intervall</span>
+          <span className="font-medium">{t("Auto-stimulus at an interval")}</span>
         </label>
         <p className="text-xs text-neutral-500 -mt-1 ml-6">
-          Speist alle X Minuten einen frischen, nicht-redundanten Stimulus in
-          die Inbox.
+          {t(
+            "Feeds a fresh, non-redundant stimulus into the inbox every X minutes.",
+          )}
         </p>
         <div className="ml-6 space-y-3">
           <div>
             <label className="block text-xs text-neutral-400 mb-1.5">
-              Intervall (Minuten)
+              {t("Interval (minutes)")}
             </label>
             <input
               type="number"
@@ -177,7 +186,7 @@ export function AutoModusTab({ instanceId }: Props) {
           </div>
           <div>
             <label className="block text-xs text-neutral-400 mb-1.5">
-              Richtung der Stimuli
+              {t("Direction of the stimuli")}
             </label>
             <textarea
               value={config.auto_stimulus_prompt ?? ""}
@@ -189,8 +198,9 @@ export function AutoModusTab({ instanceId }: Props) {
               rows={3}
             />
             <p className="text-[11px] text-neutral-600 mt-1">
-              Leer = Standard-Richtung. Erstes Intervall startet nach dem
-              Aktivieren.
+              {t(
+                "Empty = default direction. First interval starts after activation.",
+              )}
             </p>
           </div>
         </div>
@@ -202,17 +212,21 @@ export function AutoModusTab({ instanceId }: Props) {
           disabled={busy}
           className="px-4 py-2 text-sm rounded bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white"
         >
-          {busy ? "Speichern…" : "Speichern & Anwenden"}
+          {busy ? t("Saving…") : t("Save & Apply")}
         </button>
         {ok && <span className="text-xs text-emerald-400">{ok}</span>}
-        {error && <span className="text-xs text-red-400">Fehler: {error}</span>}
+        {error && (
+          <span className="text-xs text-red-400">{t("Error: {error}", { error })}</span>
+        )}
       </div>
 
       <p className="text-[11px] text-neutral-600 border-t border-neutral-900 pt-3">
-        Generierung läuft über das Routing dieser Instanz (starkes Modell unter
-        Hybrid) und durch den Governor (Budget/Rate-Limits gelten). Auto-Modus
-        ist unabhängig vom Loop-Daemon: Reize sammeln sich auch an, wenn die
-        Instanz pausiert ist.
+        {t(
+          "Generation runs through this instance's routing (strong model under " +
+            "Hybrid) and through the Governor (budget/rate limits apply). Auto mode " +
+            "is independent of the loop daemon: stimuli accumulate even when the " +
+            "instance is paused.",
+        )}
       </p>
     </div>
   );

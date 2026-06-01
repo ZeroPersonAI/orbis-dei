@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { api, type LoopEventRow } from "../lib/tauri-bindings";
+import { useT } from "../lib/i18n";
 
 interface Props {
   instanceId: string;
@@ -12,6 +13,7 @@ interface LoopGroup {
 }
 
 export function EpisodicTimeline({ instanceId, refreshTick }: Props) {
+  const { t } = useT();
   const [files, setFiles] = useState<string[]>([]);
   const [events, setEvents] = useState<LoopEventRow[]>([]);
   const [expandedLoop, setExpandedLoop] = useState<number | null>(null);
@@ -49,7 +51,7 @@ export function EpisodicTimeline({ instanceId, refreshTick }: Props) {
         if (!cancelled) setFileContent(c);
       })
       .catch((e) => {
-        if (!cancelled) setFileContent(`(could not read: ${e})`);
+        if (!cancelled) setFileContent(t("(could not read: {error})", { error: String(e) }));
       });
     return () => {
       cancelled = true;
@@ -85,7 +87,7 @@ export function EpisodicTimeline({ instanceId, refreshTick }: Props) {
 
   if (groups.length === 0) {
     return (
-      <div className="text-sm text-neutral-500">No episodic files yet.</div>
+      <div className="text-sm text-neutral-500">{t("No episodic files yet.")}</div>
     );
   }
 
@@ -107,7 +109,7 @@ export function EpisodicTimeline({ instanceId, refreshTick }: Props) {
               >
                 <span className="text-neutral-500">{expanded ? "▾" : "▸"}</span>
                 <span className="font-mono text-neutral-300">
-                  loop {String(g.loopN).padStart(5, "0")}
+                  {t("loop")} {String(g.loopN).padStart(5, "0")}
                 </span>
                 <span
                   className={
@@ -159,7 +161,7 @@ export function EpisodicTimeline({ instanceId, refreshTick }: Props) {
           </>
         ) : (
           <div className="text-sm text-neutral-600">
-            Select a loop, then a phase file.
+            {t("Select a loop, then a phase file.")}
           </div>
         )}
       </div>

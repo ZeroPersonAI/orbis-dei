@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { api, type GovernorStatus } from "../lib/tauri-bindings";
+import { useT } from "../lib/i18n";
 
 interface Props {
   /** Refresh trigger — bump this number to force a re-fetch (e.g. after a loop completes). */
@@ -9,6 +10,7 @@ interface Props {
 const POLL_MS = 15_000;
 
 export function GovernorBadge({ refreshKey = 0 }: Props) {
+  const { t } = useT();
   const [status, setStatus] = useState<GovernorStatus | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -30,7 +32,7 @@ export function GovernorBadge({ refreshKey = 0 }: Props) {
 
   if (error) {
     return (
-      <div className="text-[11px] text-red-300">governor: {error}</div>
+      <div className="text-[11px] text-red-300">{t("governor:")} {error}</div>
     );
   }
   if (!status) return null;
@@ -51,7 +53,10 @@ export function GovernorBadge({ refreshKey = 0 }: Props) {
     <div className="flex items-center gap-3 text-[11px]">
       <span
         className={`px-2 py-0.5 border rounded font-mono ${budgetClass}`}
-        title={`monthly: $${status.monthly_spent_usd.toFixed(2)} / $${status.monthly_budget_usd.toFixed(2)}`}
+        title={t("monthly: ${spent} / ${budget}", {
+          spent: status.monthly_spent_usd.toFixed(2),
+          budget: status.monthly_budget_usd.toFixed(2),
+        })}
       >
         ${status.daily_spent_usd.toFixed(2)} / $
         {status.daily_budget_usd.toFixed(2)}
@@ -61,18 +66,18 @@ export function GovernorBadge({ refreshKey = 0 }: Props) {
       {status.queue_depth > 0 && (
         <span
           className="px-2 py-0.5 border border-sky-700 text-sky-300 rounded"
-          title="Anthropic calls currently being rate-limited"
+          title={t("Anthropic calls currently being rate-limited")}
         >
-          ⏳ {status.queue_depth} queued
+          ⏳ {t("{n} queued", { n: status.queue_depth })}
         </span>
       )}
 
       {status.breaker_open && (
         <span className="px-2 py-0.5 border border-red-700 text-red-300 rounded animate-pulse">
-          ⚠ breaker open
+          ⚠ {t("breaker open")}
           {status.breaker_reopens_in_secs !== null && (
             <span className="ml-1 text-red-400">
-              ({Math.ceil(status.breaker_reopens_in_secs / 60)}m)
+              {t("({m}m)", { m: Math.ceil(status.breaker_reopens_in_secs / 60) })}
             </span>
           )}
         </span>

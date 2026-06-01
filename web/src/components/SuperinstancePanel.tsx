@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { api, type LoopEventRow } from "../lib/tauri-bindings";
+import { useT } from "../lib/i18n";
 
 interface Props {
   instanceId: string;
@@ -7,6 +8,7 @@ interface Props {
 }
 
 export function SuperinstancePanel({ instanceId, refreshTick }: Props) {
+  const { t } = useT();
   const [content, setContent] = useState<string>("");
   const [events, setEvents] = useState<LoopEventRow[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -47,11 +49,11 @@ export function SuperinstancePanel({ instanceId, refreshTick }: Props) {
   return (
     <div>
       <div className="text-xs text-neutral-500 mb-3">
-        loop events: {events.length} · integrate-ok: {integrateOk} · failed
-        phases: {failed}
+        {t("loop events:")} {events.length} · {t("integrate-ok:")} {integrateOk}{" "}
+        · {t("failed phases:")} {failed}
       </div>
       <pre className="text-xs font-mono text-neutral-300 whitespace-pre-wrap leading-relaxed">
-        {content || "(empty)"}
+        {content || t("(empty)")}
       </pre>
     </div>
   );

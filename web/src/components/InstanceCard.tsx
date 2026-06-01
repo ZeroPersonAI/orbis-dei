@@ -6,6 +6,7 @@ import {
 } from "../lib/tauri-bindings";
 import { useLoopState } from "../lib/loop-events";
 import { useDaemonState } from "../lib/daemon-events";
+import { useT } from "../lib/i18n";
 
 interface Props {
   instance: Instance;
@@ -39,6 +40,7 @@ export function InstanceCard({
   onRefresh,
   onOpen,
 }: Props) {
+  const { t } = useT();
   const loopState = useLoopState(instance.id);
   const daemon = useDaemonState(instance.id, instance.loop_counter);
   const [busy, setBusy] = useState(false);
@@ -93,7 +95,7 @@ export function InstanceCard({
       <div
         onClick={onOpen}
         className="cursor-pointer"
-        title="Open instance viewer"
+        title={t("Open instance viewer")}
       >
         <div className="flex items-start justify-between">
           <div className="min-w-0">
@@ -104,17 +106,17 @@ export function InstanceCard({
           </div>
           <div
             className={`w-2 h-2 rounded-full ${dotClass} mt-1.5 shrink-0`}
-            title={daemon.running ? "daemon running" : instance.status}
+            title={daemon.running ? t("daemon running") : instance.status}
           />
         </div>
 
         <dl className="mt-3 text-xs space-y-1">
         <div className="flex justify-between">
-          <dt className="text-neutral-500">Loop</dt>
+          <dt className="text-neutral-500">{t("Loop")}</dt>
           <dd className="text-neutral-300 font-mono">{instance.loop_counter}</dd>
         </div>
         <div className="flex justify-between">
-          <dt className="text-neutral-500">Phase</dt>
+          <dt className="text-neutral-500">{t("Phase")}</dt>
           <dd className="text-neutral-300">
             {loopState.kind === "running"
               ? loopState.phase
@@ -122,19 +124,19 @@ export function InstanceCard({
           </dd>
         </div>
         <div className="flex justify-between">
-          <dt className="text-neutral-500">Routing</dt>
+          <dt className="text-neutral-500">{t("Routing")}</dt>
           <dd className="text-neutral-300 text-[11px]">
             {ROUTING_MODE_LABELS[instance.routing_mode] ?? instance.routing_mode}
           </dd>
         </div>
         <div className="flex justify-between">
-          <dt className="text-neutral-500">Since stim.</dt>
+          <dt className="text-neutral-500">{t("Since stim.")}</dt>
           <dd className="text-neutral-300 font-mono">
             {instance.loops_since_last_stimulus}
           </dd>
         </div>
         <div className="flex justify-between">
-          <dt className="text-neutral-500">Born</dt>
+          <dt className="text-neutral-500">{t("Born")}</dt>
           <dd className="text-neutral-300">
             {new Date(instance.created_at).toLocaleDateString()}
           </dd>
@@ -144,19 +146,21 @@ export function InstanceCard({
 
       {showAutoPauseNote && (
         <div className="mt-3 p-2 bg-neutral-950 border border-amber-900 rounded text-[11px] text-amber-200">
-          {STOP_REASON_LABEL[daemon.lastStopReason!] ?? daemon.lastStopReason}
+          {STOP_REASON_LABEL[daemon.lastStopReason!]
+            ? t(STOP_REASON_LABEL[daemon.lastStopReason!])
+            : daemon.lastStopReason}
         </div>
       )}
 
       {error && (
         <div className="mt-3 p-2 bg-red-950 border border-red-900 rounded text-[11px] text-red-200">
-          <div className="font-medium">Action failed.</div>
+          <div className="font-medium">{t("Action failed.")}</div>
           <div className="mt-1 break-words">{error}</div>
           <button
             onClick={() => setError(null)}
             className="mt-1 underline text-red-300 hover:text-red-100"
           >
-            dismiss
+            {t("dismiss")}
           </button>
         </div>
       )}
@@ -168,7 +172,7 @@ export function InstanceCard({
             disabled={busy}
             className="px-2.5 py-1 bg-amber-200 text-amber-950 rounded hover:bg-amber-100 disabled:opacity-50 text-[11px]"
           >
-            ⏸ Pause
+            ⏸ {t("Pause")}
           </button>
         ) : (
           <>
@@ -176,17 +180,17 @@ export function InstanceCard({
               onClick={handlePlay}
               disabled={busy}
               className="px-2.5 py-1 bg-emerald-300 text-emerald-950 rounded hover:bg-emerald-200 disabled:opacity-50 text-[11px]"
-              title="Start continuous daemon"
+              title={t("Start continuous daemon")}
             >
-              ▶ Play
+              ▶ {t("Play")}
             </button>
             <button
               onClick={handleRunOnce}
               disabled={busy || loopState.kind === "running"}
               className="px-2.5 py-1 bg-neutral-100 text-neutral-900 rounded hover:bg-white disabled:opacity-50 text-[11px]"
-              title="Run a single loop, then stop"
+              title={t("Run a single loop, then stop")}
             >
-              Run Once
+              {t("Run Once")}
             </button>
           </>
         )}
@@ -194,13 +198,13 @@ export function InstanceCard({
           onClick={onOpenFinder}
           className="text-neutral-400 hover:text-neutral-100"
         >
-          Finder
+          {t("Finder")}
         </button>
         <button
           onClick={onDelete}
           className="text-red-400 hover:text-red-300 ml-auto"
         >
-          Delete
+          {t("Delete")}
         </button>
       </div>
     </div>

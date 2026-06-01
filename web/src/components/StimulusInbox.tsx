@@ -5,6 +5,7 @@ import {
   type StimulusKind,
 } from "../lib/tauri-bindings";
 import { StimulusForm } from "./StimulusForm";
+import { useT } from "../lib/i18n";
 
 interface Props {
   instanceId: string;
@@ -27,6 +28,7 @@ export function StimulusInbox({
   refreshTick,
   onStimulusInjected,
 }: Props) {
+  const { t } = useT();
   const [cat, setCat] = useState<Cat>("inbox");
   const [entries, setEntries] = useState<StimulusEntry[]>([]);
   const [selected, setSelected] = useState<StimulusEntry | null>(null);
@@ -73,7 +75,7 @@ export function StimulusInbox({
         if (!cancelled) setContent(c);
       })
       .catch((e) => {
-        if (!cancelled) setContent(`(could not read: ${e})`);
+        if (!cancelled) setContent(t("(could not read: {error})", { error: String(e) }));
       });
     return () => {
       cancelled = true;
@@ -102,7 +104,7 @@ export function StimulusInbox({
                 : "text-neutral-500 hover:text-neutral-300"
             }`}
           >
-            {CAT_LABELS[c]}
+            {t(CAT_LABELS[c])}
           </button>
         ))}
       </div>
@@ -111,7 +113,9 @@ export function StimulusInbox({
 
       {entries.length === 0 ? (
         <div className="text-sm text-neutral-600">
-          No stimuli in {CAT_LABELS[cat].toLowerCase()}.
+          {t("No stimuli in {category}.", {
+            category: t(CAT_LABELS[cat]).toLowerCase(),
+          })}
         </div>
       ) : (
         <div className="flex gap-4 flex-1 min-h-0">
@@ -155,7 +159,7 @@ export function StimulusInbox({
               </>
             ) : (
               <div className="text-sm text-neutral-600">
-                Select a stimulus to read it.
+                {t("Select a stimulus to read it.")}
               </div>
             )}
           </div>

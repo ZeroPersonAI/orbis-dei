@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { api, type OutboxThread } from "../lib/tauri-bindings";
+import { useT } from "../lib/i18n";
 
 interface Props {
   instanceId: string;
@@ -9,6 +10,7 @@ interface Props {
 }
 
 export function Messages({ instanceId, refreshTick, onReplied }: Props) {
+  const { t } = useT();
   const [threads, setThreads] = useState<OutboxThread[]>([]);
   const [selected, setSelected] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -97,7 +99,7 @@ export function Messages({ instanceId, refreshTick, onReplied }: Props) {
   async function send() {
     if (!thread) return;
     if (!replyBody.trim()) {
-      setSendError("Antwort darf nicht leer sein.");
+      setSendError(t("Reply must not be empty."));
       return;
     }
     const title = replyTitle.trim() || `Re: ${thread.name}`;
@@ -111,7 +113,7 @@ export function Messages({ instanceId, refreshTick, onReplied }: Props) {
         replyBody,
         thread.name,
       );
-      setOkMsg(`Geantwortet → ${path}`);
+      setOkMsg(t("Replied → {path}", { path }));
       setReplyOpen(false);
       setReplyTitle("");
       setReplyBody("");
@@ -129,8 +131,8 @@ export function Messages({ instanceId, refreshTick, onReplied }: Props) {
   if (threads.length === 0) {
     return (
       <div className="text-sm text-neutral-500">
-        Keine Nachrichten in <code className="text-neutral-400">stimuli/outbox/</code>.
-        Der Organismus schreibt hier hin, wenn er etwas an dich richten möchte.
+        {t("No messages in")} <code className="text-neutral-400">stimuli/outbox/</code>.{" "}
+        {t("The organism writes here when it wants to address you.")}
       </div>
     );
   }
@@ -140,12 +142,14 @@ export function Messages({ instanceId, refreshTick, onReplied }: Props) {
       {/* Thread list */}
       <div className="w-80 shrink-0 overflow-auto border-r border-neutral-800 pr-3">
         <div className="text-[10px] text-neutral-500 uppercase tracking-wide mb-2">
-          {threads.length} Nachricht{threads.length === 1 ? "" : "en"}
+          {threads.length === 1
+            ? t("{count} message", { count: threads.length })
+            : t("{count} messages", { count: threads.length })}
         </div>
-        {threads.map((t) => {
-          const isSel = t.name === selected;
-          const unreplied = t.replies.length === 0;
-          const unread = !t.read;
+        {threads.map((thr) => {
+          const isSel = thr.name === selected;
+          const unreplied = thr.replies.length === 0;
+          const unread = !thr.read;
           const titleClass = unread
             ? isSel
               ? "text-emerald-200 font-semibold"
@@ -155,8 +159,8 @@ export function Messages({ instanceId, refreshTick, onReplied }: Props) {
               : "text-neutral-400";
           return (
             <button
-              key={t.name}
-              onClick={() => setSelected(t.name)}
+              key={thr.name}
+              onClick={() => setSelected(thr.name)}
               className={`block w-full text-left px-2 py-2 mb-0.5 rounded hover:bg-neutral-800 ${
                 isSel ? "bg-neutral-800" : ""
               }`}
@@ -166,27 +170,27 @@ export function Messages({ instanceId, refreshTick, onReplied }: Props) {
                   className={`w-1.5 h-1.5 rounded-full ${
                     unread ? "bg-sky-400" : "bg-transparent"
                   }`}
-                  title={unread ? "ungelesen" : "gelesen"}
+                  title={unread ? t("unread") : t("read")}
                 />
                 <span
                   className={`text-[11px] font-mono truncate flex-1 ${titleClass}`}
                 >
-                  {extractTitle(t.content) || t.name}
+                  {extractTitle(thr.content) || thr.name}
                 </span>
                 {unreplied && (
                   <span
                     className="w-1.5 h-1.5 rounded-full bg-amber-400"
-                    title="noch nicht beantwortet"
+                    title={t("not yet replied")}
                   />
                 )}
-                {t.replies.length > 0 && (
+                {thr.replies.length > 0 && (
                   <span className="text-[10px] text-neutral-500 font-mono">
-                    ↩ {t.replies.length}
+                    ↩ {thr.replies.length}
                   </span>
                 )}
               </div>
               <div className="text-[10px] text-neutral-500 truncate mt-0.5 font-mono">
-                {t.name} · {fmtTime(t.modified_at)}
+                {thr.name} · {fmtTime(thr.modified_at)}
               </div>
             </button>
           );
@@ -209,18 +213,18 @@ export function Messages({ instanceId, refreshTick, onReplied }: Props) {
                 className="ml-auto text-[10px] text-neutral-500 hover:text-neutral-200"
                 title={
                   thread.read
-                    ? "als ungelesen markieren"
-                    : "als gelesen markieren"
+                    ? t("mark as unread")
+                    : t("mark as read")
                 }
               >
-                {thread.read ? "● als ungelesen" : "○ als gelesen"}
+                {thread.read ? t("● mark unread") : t("○ mark read")}
               </button>
             </div>
 
             {/* Original message */}
             <div className="border border-neutral-800 rounded p-3 bg-neutral-900/30 mb-3">
               <div className="text-[10px] text-neutral-500 uppercase tracking-wide mb-1.5">
-                Original (vom System)
+                {t("Original (from the system)")}
               </div>
               <pre className="text-xs font-mono text-neutral-300 whitespace-pre-wrap leading-relaxed">
                 {thread.content}
@@ -231,7 +235,7 @@ export function Messages({ instanceId, refreshTick, onReplied }: Props) {
             {thread.replies.length > 0 && (
               <div className="mb-3">
                 <div className="text-[10px] text-neutral-500 uppercase tracking-wide mb-1.5">
-                  Antworten ({thread.replies.length})
+                  {t("Replies ({count})", { count: thread.replies.length })}
                 </div>
                 {thread.replies.map((r) => (
                   <div
@@ -253,19 +257,19 @@ export function Messages({ instanceId, refreshTick, onReplied }: Props) {
             {replyOpen ? (
               <div className="border border-neutral-700 rounded p-3 bg-neutral-900/60">
                 <div className="text-[10px] text-neutral-500 uppercase tracking-wide mb-2">
-                  Antwort verfassen
+                  {t("Compose reply")}
                 </div>
                 <input
                   value={replyTitle}
                   onChange={(e) => setReplyTitle(e.target.value)}
-                  placeholder="Re: …"
+                  placeholder={t("Re: …")}
                   className="w-full bg-neutral-800 text-neutral-200 text-xs rounded px-2 py-1 border border-neutral-700 placeholder-neutral-600 mb-2"
                 />
                 <textarea
                   value={replyBody}
                   onChange={(e) => setReplyBody(e.target.value)}
                   rows={6}
-                  placeholder="Deine Antwort an die Instanz…"
+                  placeholder={t("Your reply to the instance…")}
                   className="w-full bg-neutral-800 text-neutral-200 text-xs rounded px-2 py-1.5 border border-neutral-700 placeholder-neutral-600 resize-y font-mono"
                 />
                 <div className="flex items-center gap-3 mt-2">
@@ -274,21 +278,21 @@ export function Messages({ instanceId, refreshTick, onReplied }: Props) {
                     disabled={sending}
                     className="px-3 py-1 text-[11px] bg-emerald-300 text-emerald-950 rounded hover:bg-emerald-200 disabled:opacity-50"
                   >
-                    {sending ? "Sende…" : "Senden"}
+                    {sending ? t("Sending…") : t("Send")}
                   </button>
                   <button
                     onClick={() => setReplyOpen(false)}
                     disabled={sending}
                     className="px-3 py-1 text-[11px] text-neutral-400 hover:text-neutral-200"
                   >
-                    Abbrechen
+                    {t("Cancel")}
                   </button>
                   {sendError && (
                     <span className="text-[11px] text-red-400">{sendError}</span>
                   )}
                 </div>
                 <div className="text-[10px] text-neutral-500 mt-2">
-                  Landet als Stimulus in <code>stimuli/inbox/</code> mit{" "}
+                  {t("Lands as a stimulus in")} <code>stimuli/inbox/</code> {t("with")}{" "}
                   <code>Reply-To: stimuli/outbox/{thread.name}</code>.
                 </div>
               </div>
@@ -298,7 +302,7 @@ export function Messages({ instanceId, refreshTick, onReplied }: Props) {
                   onClick={startReply}
                   className="px-3 py-1.5 text-xs bg-neutral-100 text-neutral-900 rounded hover:bg-white"
                 >
-                  ↩ Antworten
+                  ↩ {t("Reply")}
                 </button>
                 {okMsg && (
                   <span className="text-[11px] text-emerald-400 font-mono break-all">
@@ -309,7 +313,7 @@ export function Messages({ instanceId, refreshTick, onReplied }: Props) {
             )}
           </>
         ) : (
-          <div className="text-sm text-neutral-600">Wähle eine Nachricht aus.</div>
+          <div className="text-sm text-neutral-600">{t("Select a message.")}</div>
         )}
       </div>
     </div>

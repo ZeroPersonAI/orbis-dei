@@ -5,6 +5,7 @@ import {
   type RoutingMode,
 } from "../lib/tauri-bindings";
 import { RoutingEditor, parsePhaseMap } from "./RoutingEditor";
+import { useT } from "../lib/i18n";
 
 interface Props {
   onCancel: () => void;
@@ -16,6 +17,7 @@ interface Props {
 }
 
 export function NewInstanceDialog({ onCancel, onConfirm }: Props) {
+  const { t } = useT();
   const [name, setName] = useState("");
   const [routing, setRouting] = useState<RoutingMode>("anthropic");
   const [phaseMap, setPhaseMap] = useState<Record<string, Provider>>(
@@ -59,19 +61,20 @@ export function NewInstanceDialog({ onCancel, onConfirm }: Props) {
         onClick={(e) => e.stopPropagation()}
         className="bg-neutral-900 border border-neutral-800 rounded-lg p-6 w-full max-w-md mx-4"
       >
-        <h2 className="text-lg font-light">New Instance</h2>
+        <h2 className="text-lg font-light">{t("New Instance")}</h2>
         <p className="text-xs text-neutral-500 mt-1 mb-5">
-          A new isolated Orbis Dei organism. Filesystem layout, constitution,
-          and git repository are initialized in one transactional step.
+          {t(
+            "A new isolated Orbis Dei organism. Filesystem layout, constitution, and git repository are initialized in one transactional step.",
+          )}
         </p>
 
-        <label className="block text-xs text-neutral-400 mb-1.5">Name</label>
+        <label className="block text-xs text-neutral-400 mb-1.5">{t("Name")}</label>
         <input
           autoFocus
           type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          placeholder="e.g. lauf-3-alpha"
+          placeholder={t("e.g. lauf-3-alpha")}
           className="w-full bg-neutral-950 border border-neutral-800 rounded px-3 py-2 text-sm focus:outline-none focus:border-neutral-600 mb-4"
           maxLength={120}
         />
@@ -85,8 +88,9 @@ export function NewInstanceDialog({ onCancel, onConfirm }: Props) {
           }}
         />
         <p className="text-[10px] text-neutral-600 mt-2">
-          Provider + Modell (aus Einstellungen) je Loop-Phase. Der nötige
-          API-Key muss in den Einstellungen hinterlegt sein.
+          {t(
+            "Provider + model (from settings) per loop phase. The required API key must be set in settings.",
+          )}
         </p>
 
         <div className="mt-6 flex justify-end gap-2">
@@ -96,14 +100,14 @@ export function NewInstanceDialog({ onCancel, onConfirm }: Props) {
             disabled={submitting}
             className="px-3 py-1.5 text-sm text-neutral-400 hover:text-neutral-100 disabled:opacity-50"
           >
-            Cancel
+            {t("Cancel")}
           </button>
           <button
             type="submit"
             disabled={!name.trim() || submitting}
             className="px-4 py-1.5 text-sm bg-neutral-100 text-neutral-900 rounded hover:bg-white disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {submitting ? "Creating…" : "Create"}
+            {submitting ? t("Creating…") : t("Create")}
           </button>
         </div>
       </form>

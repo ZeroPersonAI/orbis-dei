@@ -8,6 +8,7 @@ import { NewInstanceDialog } from "../components/NewInstanceDialog";
 import { InstanceCard } from "../components/InstanceCard";
 import { GovernorBadge } from "../components/GovernorBadge";
 import { useRunningDaemonCount } from "../lib/daemon-events";
+import { useT, LanguageSwitcher } from "../lib/i18n";
 
 interface Props {
   onOpenSettings: () => void;
@@ -15,6 +16,7 @@ interface Props {
 }
 
 export function HabitatView({ onOpenSettings, onOpenInstance }: Props) {
+  const { t } = useT();
   const [governorRefresh, setGovernorRefresh] = useState(0);
   const runningDaemons = useRunningDaemonCount(governorRefresh);
   const [instances, setInstances] = useState<Instance[]>([]);
@@ -61,7 +63,10 @@ export function HabitatView({ onOpenSettings, onOpenInstance }: Props) {
   async function handleDelete(id: string, name: string) {
     if (
       !window.confirm(
-        `Delete instance "${name}"?\n\nThis removes its folder, git history, and database row. Cannot be undone.`,
+        t(
+          'Delete instance "{name}"?\n\nThis removes its folder, git history, and database row. Cannot be undone.',
+          { name },
+        ),
       )
     )
       return;
@@ -79,8 +84,8 @@ export function HabitatView({ onOpenSettings, onOpenInstance }: Props) {
         <div>
           <h1 className="text-xl font-light tracking-tight">Orbis Dei</h1>
           <p className="text-xs text-neutral-500 mt-0.5">
-            Habitat — {instances.length}{" "}
-            {instances.length === 1 ? "instance" : "instances"}
+            {t("Habitat")} — {instances.length}{" "}
+            {instances.length === 1 ? t("instance") : t("instances")}
           </p>
         </div>
         <div className="flex items-center gap-4">
@@ -90,7 +95,11 @@ export function HabitatView({ onOpenSettings, onOpenInstance }: Props) {
               onClick={async () => {
                 if (
                   !window.confirm(
-                    `Pause all ${runningDaemons} running daemon${runningDaemons === 1 ? "" : "s"}?`,
+                    runningDaemons === 1
+                      ? t("Pause the 1 running daemon?")
+                      : t("Pause all {n} running daemons?", {
+                          n: runningDaemons,
+                        }),
                   )
                 )
                   return;
@@ -102,14 +111,15 @@ export function HabitatView({ onOpenSettings, onOpenInstance }: Props) {
                 }
               }}
               className="px-3 py-1.5 text-sm bg-red-600 text-white rounded hover:bg-red-500 transition"
-              title="Stop every running daemon immediately"
+              title={t("Stop every running daemon immediately")}
             >
-              ⏸ Pause All ({runningDaemons})
+              ⏸ {t("Pause All")} ({runningDaemons})
             </button>
           )}
+          <LanguageSwitcher />
           <button
             onClick={onOpenSettings}
-            title="Settings"
+            title={t("Settings")}
             className="text-neutral-400 hover:text-neutral-100 text-xl leading-none"
           >
             ⚙
@@ -118,7 +128,7 @@ export function HabitatView({ onOpenSettings, onOpenInstance }: Props) {
             onClick={() => setShowNew(true)}
             className="px-3 py-1.5 text-sm bg-neutral-100 text-neutral-900 rounded hover:bg-white transition"
           >
-            New Instance
+            {t("New Instance")}
           </button>
         </div>
       </header>
@@ -130,7 +140,7 @@ export function HabitatView({ onOpenSettings, onOpenInstance }: Props) {
             onClick={() => setError(null)}
             className="text-red-300 hover:text-red-100 underline"
           >
-            dismiss
+            {t("dismiss")}
           </button>
         </div>
       )}
@@ -138,36 +148,35 @@ export function HabitatView({ onOpenSettings, onOpenInstance }: Props) {
       <main className="flex-1 overflow-auto p-6">
         {loading ? (
           <div className="h-full flex items-center justify-center text-neutral-500 text-sm">
-            Loading…
+            {t("Loading…")}
           </div>
         ) : instances.length === 0 ? (
           <div className="h-full flex items-center justify-center text-neutral-500">
             <div className="text-center max-w-md">
-              <p className="text-sm text-neutral-300">Welcome.</p>
+              <p className="text-sm text-neutral-300">{t("Welcome.")}</p>
               <p className="text-xs mt-2 leading-relaxed">
-                Orbis Dei is an autopoietic organism that writes, runs, and
-                reviews itself one six-phase loop at a time. This app hosts
-                many such organisms side by side — each isolated, with its
-                own corpus, git history, and constitution.
+                {t(
+                  "Orbis Dei is an autopoietic organism that writes, runs, and reviews itself one six-phase loop at a time. This app hosts many such organisms side by side — each isolated, with its own corpus, git history, and constitution.",
+                )}
               </p>
               {hasKey === false && (
                 <p className="text-xs mt-3 leading-relaxed text-amber-300/80">
-                  Tip: open{" "}
+                  {t("Tip: open")}{" "}
                   <button
                     onClick={onOpenSettings}
                     className="underline hover:text-amber-200"
                   >
-                    Settings
+                    {t("Settings")}
                   </button>{" "}
-                  to add an Anthropic API key for remote inference, or pick
-                  the <span className="text-neutral-300">All Ollama</span>{" "}
-                  routing mode when you create the instance.
+                  {t("to add an Anthropic API key for remote inference, or pick the")}{" "}
+                  <span className="text-neutral-300">{t("All Ollama")}</span>{" "}
+                  {t("routing mode when you create the instance.")}
                 </p>
               )}
               <p className="text-xs mt-3 leading-relaxed">
-                Click{" "}
-                <span className="text-neutral-300">New Instance</span> to
-                bring one into being.
+                {t("Click")}{" "}
+                <span className="text-neutral-300">{t("New Instance")}</span>{" "}
+                {t("to bring one into being.")}
               </p>
             </div>
           </div>

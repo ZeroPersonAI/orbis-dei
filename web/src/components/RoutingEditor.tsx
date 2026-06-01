@@ -5,6 +5,7 @@ import {
   type Provider,
   type RoutingMode,
 } from "../lib/tauri-bindings";
+import { useT } from "../lib/i18n";
 
 interface Props {
   routingMode: RoutingMode;
@@ -33,10 +34,11 @@ export function parsePhaseMap(json: string | null): Record<string, Provider> {
 }
 
 export function RoutingEditor({ routingMode, phaseMap, onChange }: Props) {
+  const { t } = useT();
   return (
     <div className="space-y-3">
       <div>
-        <label className="block text-xs text-neutral-400 mb-1.5">Provider</label>
+        <label className="block text-xs text-neutral-400 mb-1.5">{t("Provider")}</label>
         <select
           value={routingMode}
           onChange={(e) => onChange(e.target.value as RoutingMode, phaseMap)}
@@ -55,8 +57,9 @@ export function RoutingEditor({ routingMode, phaseMap, onChange }: Props) {
       {routingMode === "custom" && (
         <div className="space-y-2 border-l-2 border-neutral-800 pl-3">
           <p className="text-[11px] text-neutral-600">
-            Provider je Loop-Phase. Das Modell pro Provider kommt aus den
-            Einstellungen.
+            {t(
+              "Provider per loop phase. The model per provider comes from settings.",
+            )}
           </p>
           {LOOP_PHASES.map((phase) => (
             <div key={phase} className="flex items-center justify-between gap-3">

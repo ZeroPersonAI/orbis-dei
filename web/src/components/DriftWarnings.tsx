@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { api, type DriftMetrics } from "../lib/tauri-bindings";
+import { useT } from "../lib/i18n";
 
 interface Props {
   instanceId: string;
@@ -12,6 +13,7 @@ interface Banner {
 }
 
 export function DriftWarnings({ instanceId, refreshTick }: Props) {
+  const { t } = useT();
   const [m, setM] = useState<DriftMetrics | null>(null);
 
   useEffect(() => {
@@ -37,12 +39,17 @@ export function DriftWarnings({ instanceId, refreshTick }: Props) {
   if (m.network_access === "open") {
     banners.push({
       level: "red",
-      text: "Network: OPEN — sandbox firewall is disabled. All tools have raw network access. Flip it back to off/gated in Settings when you're done exploring.",
+      text: t(
+        "Network: OPEN — sandbox firewall is disabled. All tools have raw network access. Flip it back to off/gated in Settings when you're done exploring.",
+      ),
     });
   } else if (m.network_access === "gated") {
     banners.push({
       level: "amber",
-      text: `Network: GATED — sandbox allows TCP 80/443 to ${m.network_allowlist_len} allowlisted host(s).`,
+      text: t(
+        "Network: GATED — sandbox allows TCP 80/443 to {n} allowlisted host(s).",
+        { n: m.network_allowlist_len },
+      ),
     });
   }
 
@@ -50,12 +57,17 @@ export function DriftWarnings({ instanceId, refreshTick }: Props) {
   if (m.tool_lag >= 200) {
     banners.push({
       level: "red",
-      text: `SC-005: ${m.tool_lag} Loops ohne neues Tool (Grenze 200). Diverge sollte ein Tool synthetisieren oder die Abstinenz dokumentieren.`,
+      text: t(
+        "SC-005: {n} loops without a new tool (limit 200). Diverge should synthesize a tool or document the abstinence.",
+        { n: m.tool_lag },
+      ),
     });
   } else if (m.tool_lag >= 100) {
     banners.push({
       level: "amber",
-      text: `SC-005: ${m.tool_lag} Loops ohne neues Tool — Annäherung an die 200er-Grenze.`,
+      text: t("SC-005: {n} loops without a new tool — approaching the 200 limit.", {
+        n: m.tool_lag,
+      }),
     });
   }
 
@@ -63,12 +75,18 @@ export function DriftWarnings({ instanceId, refreshTick }: Props) {
   if (m.unanimous_streak >= 20) {
     banners.push({
       level: "red",
-      text: `SC-004: ${m.unanimous_streak} aufeinanderfolgende unanime Elections — Filter-Versagen-Verdacht. RSI-Diagnose der Überinstanz angezeigt.`,
+      text: t(
+        "SC-004: {n} consecutive unanimous elections — suspected filter failure. RSI diagnosis by the superinstance is indicated.",
+        { n: m.unanimous_streak },
+      ),
     });
   } else if (m.unanimous_streak >= 15) {
     banners.push({
       level: "amber",
-      text: `SC-004: ${m.unanimous_streak} aufeinanderfolgende unanime Elections. Bei 20 wird automatische RSI-Diagnose erwartet.`,
+      text: t(
+        "SC-004: {n} consecutive unanimous elections. At 20, automatic RSI diagnosis is expected.",
+        { n: m.unanimous_streak },
+      ),
     });
   }
 
@@ -79,7 +97,10 @@ export function DriftWarnings({ instanceId, refreshTick }: Props) {
   ) {
     banners.push({
       level: "amber",
-      text: `Drift-Detektion eingeschränkt: ${m.elect_markers_missing}/${m.elect_window} Elect-Files ohne ELECT_RESULT-Marker. SC-004-Tracking unzuverlässig.`,
+      text: t(
+        "Drift detection limited: {missing}/{window} elect files without ELECT_RESULT marker. SC-004 tracking unreliable.",
+        { missing: m.elect_markers_missing, window: m.elect_window },
+      ),
     });
   }
 

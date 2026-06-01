@@ -7,6 +7,11 @@ yet tag releases.
 ## [Unreleased]
 
 ### Added
+- Multilingual UI (English, Deutsch, 中文, Español, Français). Lightweight
+  gettext-style i18n (`web/src/lib/i18n.tsx`): the English source string is the
+  key, missing translations fall back to English. Default English; a language
+  switcher in the header and Settings persists the choice. 271 UI strings
+  translated into all five languages.
 - Initial release of the Orbis Dei habitat server.
   - Express + WebSocket host; commands as `POST /api/command/<name>`, events
     broadcast over `/ws`.

@@ -1,3 +1,5 @@
+import { useT } from "../lib/i18n";
+
 const PHASES = [
   "observe",
   "diverge",
@@ -13,6 +15,7 @@ interface Props {
 }
 
 export function PhaseIndicator({ activePhase }: Props) {
+  const { t } = useT();
   const activeIdx = activePhase
     ? PHASES.indexOf(activePhase as (typeof PHASES)[number])
     : -1;
@@ -35,7 +38,7 @@ export function PhaseIndicator({ activePhase }: Props) {
         return (
           <div key={phase} className="flex items-center gap-1">
             <div className={`w-2 h-2 rounded-full ${dotClass}`} />
-            <span className={labelClass}>{phase}</span>
+            <span className={labelClass}>{t(phase)}</span>
             {idx < PHASES.length - 1 && (
               <span className="text-neutral-700 mx-0.5">·</span>
             )}

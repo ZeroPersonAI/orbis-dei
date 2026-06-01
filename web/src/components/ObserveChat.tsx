@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { api, type ChatMessage } from "../lib/tauri-bindings";
+import { useT } from "../lib/i18n";
 
 interface Props {
   instanceId: string;
@@ -11,6 +12,7 @@ interface UiTurn extends ChatMessage {
 }
 
 export function ObserveChat({ instanceId }: Props) {
+  const { t } = useT();
   const [turns, setTurns] = useState<UiTurn[]>([]);
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
@@ -69,10 +71,12 @@ export function ObserveChat({ instanceId }: Props) {
   return (
     <div className="h-full flex flex-col">
       <div className="text-[11px] text-neutral-500 mb-3 leading-relaxed">
-        A read-only window into this instance. The LLM uses tools to consult
-        actual files (state, episodic, stimuli, drift metrics). It speaks in
-        the third person and says when something isn't there — it does{" "}
-        <em>not</em> claim to be the organism.
+        {t(
+          "A read-only window into this instance. The LLM uses tools to consult " +
+            "actual files (state, episodic, stimuli, drift metrics). It speaks in " +
+            "the third person and says when something isn't there — it does",
+        )}{" "}
+        <em>{t("not")}</em> {t("claim to be the organism.")}
       </div>
 
       <div
@@ -81,39 +85,45 @@ export function ObserveChat({ instanceId }: Props) {
       >
         {turns.length === 0 && (
           <div className="text-sm text-neutral-600 italic">
-            Frag z.B. „woran arbeitet das System gerade?" oder „warum ist Loop
-            12 fehlgeschlagen?"
+            {t(
+              "Ask e.g. “what is the system working on right now?” or " +
+                "“why did loop 12 fail?”",
+            )}
           </div>
         )}
-        {turns.map((t, i) => (
+        {turns.map((turn, i) => (
           <div key={i} className="mb-4 last:mb-1">
             <div
               className={`text-[10px] uppercase tracking-wide mb-1 ${
-                t.role === "user"
+                turn.role === "user"
                   ? "text-neutral-500"
-                  : t.error
+                  : turn.error
                     ? "text-red-400"
                     : "text-emerald-400"
               }`}
             >
-              {t.role === "user" ? "operator" : t.error ? "error" : "window"}
+              {turn.role === "user"
+                ? t("operator")
+                : turn.error
+                  ? t("error")
+                  : t("window")}
             </div>
             <div
               className={`text-sm whitespace-pre-wrap leading-relaxed ${
-                t.error ? "text-red-300" : "text-neutral-200"
+                turn.error ? "text-red-300" : "text-neutral-200"
               }`}
             >
-              {t.content}
+              {turn.content}
             </div>
-            {t.toolsUsed && t.toolsUsed.length > 0 && (
+            {turn.toolsUsed && turn.toolsUsed.length > 0 && (
               <div className="text-[10px] text-neutral-500 mt-1 font-mono">
-                tools: {t.toolsUsed.join(", ")}
+                {t("tools:")} {turn.toolsUsed.join(", ")}
               </div>
             )}
           </div>
         ))}
         {sending && (
-          <div className="text-[11px] text-neutral-500 italic">consulting telemetry…</div>
+          <div className="text-[11px] text-neutral-500 italic">{t("consulting telemetry…")}</div>
         )}
       </div>
 
@@ -123,7 +133,7 @@ export function ObserveChat({ instanceId }: Props) {
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKey}
           rows={3}
-          placeholder="Frage zum aktuellen Zustand der Instanz… (⌘↵ zum Senden)"
+          placeholder={t("Question about the instance's current state… (⌘↵ to send)")}
           className="flex-1 bg-neutral-800 text-neutral-100 text-sm rounded px-3 py-2 border border-neutral-700 placeholder-neutral-600 resize-y font-mono"
         />
         <button
@@ -131,7 +141,7 @@ export function ObserveChat({ instanceId }: Props) {
           disabled={sending || !input.trim()}
           className="px-3 py-2 text-xs bg-emerald-300 text-emerald-950 rounded hover:bg-emerald-200 disabled:opacity-50 self-stretch"
         >
-          {sending ? "…" : "Send"}
+          {sending ? "…" : t("Send")}
         </button>
       </div>
     </div>

@@ -4,6 +4,7 @@ import {
   STIMULUS_KIND_LABELS,
   type StimulusKind,
 } from "../lib/tauri-bindings";
+import { useT } from "../lib/i18n";
 
 interface Props {
   instanceId: string;
@@ -16,6 +17,7 @@ interface Refinement {
 }
 
 export function StimulusForm({ instanceId, onInjected }: Props) {
+  const { t } = useT();
   const [kind, setKind] = useState<StimulusKind>("discrete");
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
@@ -30,7 +32,7 @@ export function StimulusForm({ instanceId, onInjected }: Props) {
 
   async function refine() {
     if (!body.trim()) {
-      setError("Nothing to refine — the body is empty.");
+      setError(t("Nothing to refine — the body is empty."));
       return;
     }
     setRefining(true);
@@ -54,7 +56,7 @@ export function StimulusForm({ instanceId, onInjected }: Props) {
 
   async function inject(useRefined: boolean) {
     if (!title.trim()) {
-      setError("Title is required.");
+      setError(t("Title is required."));
       return;
     }
     const bodyToInject = useRefined ? refinedBody : body;
@@ -69,7 +71,9 @@ export function StimulusForm({ instanceId, onInjected }: Props) {
         bodyToInject,
       );
       setOkMsg(
-        `Injected ${useRefined ? "refined" : "original"} → ${path}`,
+        useRefined
+          ? t("Injected refined → {path}", { path })
+          : t("Injected original → {path}", { path }),
       );
       setTitle("");
       setBody("");
@@ -100,7 +104,7 @@ export function StimulusForm({ instanceId, onInjected }: Props) {
         <input
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          placeholder="Title"
+          placeholder={t("Title")}
           className="flex-1 bg-neutral-800 text-neutral-200 text-xs rounded px-2 py-1 border border-neutral-700 placeholder-neutral-600"
         />
       </div>
@@ -110,7 +114,7 @@ export function StimulusForm({ instanceId, onInjected }: Props) {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-2">
             <div>
               <div className="text-[10px] text-neutral-500 uppercase tracking-wide mb-1">
-                Original
+                {t("Original")}
               </div>
               <textarea
                 value={body}
@@ -121,7 +125,7 @@ export function StimulusForm({ instanceId, onInjected }: Props) {
             </div>
             <div>
               <div className="text-[10px] text-emerald-400 uppercase tracking-wide mb-1">
-                Refined (editable)
+                {t("Refined (editable)")}
               </div>
               <textarea
                 value={refinedBody}
@@ -144,21 +148,21 @@ export function StimulusForm({ instanceId, onInjected }: Props) {
               disabled={busy}
               className="px-3 py-1 text-[11px] bg-emerald-300 text-emerald-950 rounded hover:bg-emerald-200 disabled:opacity-50"
             >
-              {busy ? "Injecting…" : "Inject refined"}
+              {busy ? t("Injecting…") : t("Inject refined")}
             </button>
             <button
               onClick={() => inject(false)}
               disabled={busy}
               className="px-3 py-1 text-[11px] bg-neutral-200 text-neutral-900 rounded hover:bg-white disabled:opacity-50"
             >
-              Inject original
+              {t("Inject original")}
             </button>
             <button
               onClick={discardRefinement}
               disabled={busy}
               className="px-3 py-1 text-[11px] text-neutral-400 hover:text-neutral-200"
             >
-              Discard refinement
+              {t("Discard refinement")}
             </button>
             {okMsg && (
               <span className="text-[11px] text-emerald-400 font-mono break-all">
@@ -173,7 +177,7 @@ export function StimulusForm({ instanceId, onInjected }: Props) {
           <textarea
             value={body}
             onChange={(e) => setBody(e.target.value)}
-            placeholder="Stimulus body — material for the organism to react to…"
+            placeholder={t("Stimulus body — material for the organism to react to…")}
             rows={4}
             className="w-full bg-neutral-800 text-neutral-200 text-xs rounded px-2 py-1.5 border border-neutral-700 placeholder-neutral-600 resize-y font-mono"
           />
@@ -183,15 +187,15 @@ export function StimulusForm({ instanceId, onInjected }: Props) {
               disabled={busy || refining}
               className="px-3 py-1 text-[11px] bg-emerald-300 text-emerald-950 rounded hover:bg-emerald-200 disabled:opacity-50"
             >
-              {busy ? "Injecting…" : "Inject stimulus"}
+              {busy ? t("Injecting…") : t("Inject stimulus")}
             </button>
             <button
               onClick={refine}
               disabled={busy || refining || !body.trim()}
               className="px-3 py-1 text-[11px] bg-neutral-200 text-neutral-900 rounded hover:bg-white disabled:opacity-50"
-              title="Refine for clarity (not persuasiveness) — needs an Anthropic key"
+              title={t("Refine for clarity (not persuasiveness) — needs an Anthropic key")}
             >
-              {refining ? "Refining…" : "Refine for clarity"}
+              {refining ? t("Refining…") : t("Refine for clarity")}
             </button>
             {okMsg && (
               <span className="text-[11px] text-emerald-400 font-mono break-all">

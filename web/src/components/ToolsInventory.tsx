@@ -4,6 +4,7 @@ import {
   type ToolFile,
   type ToolUsage,
 } from "../lib/tauri-bindings";
+import { useT } from "../lib/i18n";
 
 interface Props {
   instanceId: string;
@@ -11,6 +12,7 @@ interface Props {
 }
 
 export function ToolsInventory({ instanceId, refreshTick }: Props) {
+  const { t } = useT();
   const [tools, setTools] = useState<ToolFile[]>([]);
   const [usage, setUsage] = useState<ToolUsage[]>([]);
   const [selected, setSelected] = useState<string | null>(null);
@@ -46,9 +48,8 @@ export function ToolsInventory({ instanceId, refreshTick }: Props) {
   if (tools.length === 0) {
     return (
       <div className="text-sm text-neutral-500">
-        No tools yet. The organism writes tools under{" "}
-        <code className="text-neutral-400">tools/native/</code> during the Expand
-        phase.
+        {t("No tools yet. The organism writes tools under")}{" "}
+        <code className="text-neutral-400">tools/native/</code> {t("during the Expand phase.")}
       </div>
     );
   }
@@ -57,19 +58,25 @@ export function ToolsInventory({ instanceId, refreshTick }: Props) {
     <div className="flex gap-4 h-full">
       <div className="w-80 shrink-0 overflow-auto border-r border-neutral-800 pr-3">
         <div className="text-[10px] text-neutral-500 uppercase tracking-wide mb-2">
-          {tools.length} tool{tools.length === 1 ? "" : "s"} · {usage.length} with
-          run history
+          {tools.length === 1
+            ? t("{count} tool", { count: tools.length })
+            : t("{count} tools", { count: tools.length })}{" "}
+          · {t("{count} with run history", { count: usage.length })}
         </div>
-        {tools.map((t) => {
-          const u = usageByTool.get(t.rel_path);
-          const selectedRow = selected === t.rel_path;
+        {tools.map((tool) => {
+          const u = usageByTool.get(tool.rel_path);
+          const selectedRow = selected === tool.rel_path;
           const summary = u
-            ? `${u.runs} run${u.runs === 1 ? "" : "s"} · ${u.successes}✓ ${u.failures}✗`
-            : "no recorded runs";
+            ? `${
+                u.runs === 1
+                  ? t("{count} run", { count: u.runs })
+                  : t("{count} runs", { count: u.runs })
+              } · ${u.successes}✓ ${u.failures}✗`
+            : t("no recorded runs");
           return (
             <button
-              key={t.rel_path}
-              onClick={() => setSelected(t.rel_path)}
+              key={tool.rel_path}
+              onClick={() => setSelected(tool.rel_path)}
               className={`block w-full text-left px-2 py-1.5 mb-0.5 rounded hover:bg-neutral-800 ${
                 selectedRow ? "bg-neutral-800" : ""
               }`}
@@ -79,10 +86,10 @@ export function ToolsInventory({ instanceId, refreshTick }: Props) {
                   selectedRow ? "text-emerald-300" : "text-neutral-300"
                 }`}
               >
-                {t.name}
+                {tool.name}
               </div>
               <div className="text-[10px] text-neutral-500 truncate font-mono">
-                {t.rel_path.replace(/\/[^/]+$/, "")} · {humanSize(t.size)} ·{" "}
+                {tool.rel_path.replace(/\/[^/]+$/, "")} · {humanSize(tool.size)} ·{" "}
                 {summary}
               </div>
             </button>
@@ -97,7 +104,7 @@ export function ToolsInventory({ instanceId, refreshTick }: Props) {
               {selectedTool.rel_path}
             </div>
             <div className="text-[11px] text-neutral-500 mb-2">
-              {humanSize(selectedTool.size)} · modified{" "}
+              {humanSize(selectedTool.size)} · {t("modified")}{" "}
               {selectedTool.modified_at.slice(0, 19).replace("T", " ")}
               {selectedTool.shebang && (
                 <>
@@ -112,8 +119,9 @@ export function ToolsInventory({ instanceId, refreshTick }: Props) {
                   <span className="text-neutral-200 font-mono">
                     {selectedUsage.runs}
                   </span>{" "}
-                  run{selectedUsage.runs === 1 ? "" : "s"} in the last 50
-                  loops —{" "}
+                  {selectedUsage.runs === 1
+                    ? t("run in the last 50 loops —")
+                    : t("runs in the last 50 loops —")}{" "}
                   <span className="text-emerald-400">
                     {selectedUsage.successes}✓
                   </span>{" "}
@@ -123,9 +131,9 @@ export function ToolsInventory({ instanceId, refreshTick }: Props) {
                 </div>
                 {selectedUsage.last_loop !== null && (
                   <div className="text-neutral-500 mt-0.5">
-                    last seen loop {selectedUsage.last_loop}
+                    {t("last seen loop")} {selectedUsage.last_loop}
                     {selectedUsage.last_exit !== null && (
-                      <> · exit {selectedUsage.last_exit}</>
+                      <> · {t("exit")} {selectedUsage.last_exit}</>
                     )}
                   </div>
                 )}
@@ -133,12 +141,12 @@ export function ToolsInventory({ instanceId, refreshTick }: Props) {
             )}
             <pre className="text-xs font-mono text-neutral-300 whitespace-pre-wrap leading-relaxed">
               {selectedTool.content}
-              {selectedTool.content_truncated && "\n\n…[truncated]"}
+              {selectedTool.content_truncated && `\n\n${t("…[truncated]")}`}
             </pre>
           </>
         ) : (
           <div className="text-sm text-neutral-600">
-            Select a tool to inspect it.
+            {t("Select a tool to inspect it.")}
           </div>
         )}
       </div>

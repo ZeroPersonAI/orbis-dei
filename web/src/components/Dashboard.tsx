@@ -7,6 +7,7 @@ import {
   type InvariantsSnapshot,
 } from "../lib/tauri-bindings";
 import { InstanceRoutingCard } from "./InstanceRoutingCard";
+import { useT } from "../lib/i18n";
 
 interface Props {
   instanceId: string;
@@ -41,6 +42,7 @@ const NETWORK_BADGE: Record<string, string> = {
 };
 
 export function Dashboard({ instanceId, refreshTick }: Props) {
+  const { t } = useT();
   const [d, setD] = useState<Data | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -89,7 +91,10 @@ export function Dashboard({ instanceId, refreshTick }: Props) {
   }, [instanceId, refreshTick]);
 
   if (error) return <div className="text-sm text-red-300">{error}</div>;
-  if (!d) return <div className="text-sm text-neutral-500">Loading dashboard…</div>;
+  if (!d)
+    return (
+      <div className="text-sm text-neutral-500">{t("Loading dashboard…")}</div>
+    );
 
   const statusKey = d.instance.status;
   const statusColor = STATUS_COLORS[statusKey] ?? STATUS_COLORS.idle;
@@ -97,10 +102,10 @@ export function Dashboard({ instanceId, refreshTick }: Props) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
       {/* Identity */}
-      <Card title="Status">
+      <Card title={t("Status")}>
         <div className="flex items-baseline gap-2">
           <span className="text-2xl font-light text-neutral-100">
-            loop {d.invariants.loop_n}
+            {t("loop")} {d.invariants.loop_n}
           </span>
           <span
             className={`px-2 py-0.5 text-[10px] rounded uppercase tracking-wide ${statusColor}`}
@@ -108,17 +113,17 @@ export function Dashboard({ instanceId, refreshTick }: Props) {
             {statusKey.replace("_", " ")}
           </span>
         </div>
-        <KV label="Phase">{d.instance.current_phase ?? "—"}</KV>
-        <KV label="Routing">
+        <KV label={t("Phase")}>{d.instance.current_phase ?? "—"}</KV>
+        <KV label={t("Routing")}>
           {ROUTING_MODE_LABELS[d.instance.routing_mode] ?? d.instance.routing_mode}
         </KV>
-        <KV label="Loops seit Stimulus">
+        <KV label={t("Loops since stimulus")}>
           {d.instance.loops_since_last_stimulus}
         </KV>
-        <KV label="Letzter Stimulus">
+        <KV label={t("Last stimulus")}>
           {d.instance.last_stimulus_at
             ? d.instance.last_stimulus_at.slice(0, 19).replace("T", " ")
-            : "nie"}
+            : t("never")}
         </KV>
       </Card>
 
@@ -126,7 +131,7 @@ export function Dashboard({ instanceId, refreshTick }: Props) {
 
       {/* SP-I integrity grid */}
       <Card
-        title="Strukturelle Integrität (SP-I)"
+        title={t("Structural integrity (SP-I)")}
         accent={d.invariants.all_passed ? "emerald" : "red"}
         className="md:col-span-1 xl:col-span-2"
       >
@@ -144,7 +149,7 @@ export function Dashboard({ instanceId, refreshTick }: Props) {
                     : "bg-red-950 text-red-300"
                 }`}
               >
-                {c.passed ? "PASS" : "FAIL"}
+                {c.passed ? t("PASS") : t("FAIL")}
               </span>
               <span className="text-neutral-300 font-mono whitespace-nowrap">
                 {c.id}
@@ -155,18 +160,19 @@ export function Dashboard({ instanceId, refreshTick }: Props) {
         </div>
         {!d.invariants.all_passed && (
           <div className="mt-2 text-[11px] text-red-300 border-t border-red-900/40 pt-2">
-            Die nächste Review-Phase würde rollbacken — schau die fehlenden
-            Checks an.
+            {t(
+              "The next review phase would roll back — check the missing checks.",
+            )}
           </div>
         )}
       </Card>
 
       {/* Drift signals */}
-      <Card title="Drift-Signale">
+      <Card title={t("Drift signals")}>
         <Signal
-          label="Tool-Lag (SC-005)"
+          label={t("Tool lag (SC-005)")}
           value={d.drift.tool_lag}
-          unit={`Loops · letzter neu: ${d.drift.last_tool_loop}`}
+          unit={t("loops · last new: {loop}", { loop: d.drift.last_tool_loop })}
           level={
             d.drift.tool_lag >= 200
               ? "red"
@@ -176,9 +182,9 @@ export function Dashboard({ instanceId, refreshTick }: Props) {
           }
         />
         <Signal
-          label="Unanim-Streak (SC-004)"
+          label={t("Unanimous streak (SC-004)")}
           value={d.drift.unanimous_streak}
-          unit={`von max ${d.drift.elect_window} im Fenster`}
+          unit={t("of max {n} in the window", { n: d.drift.elect_window })}
           level={
             d.drift.unanimous_streak >= 20
               ? "red"
@@ -188,9 +194,9 @@ export function Dashboard({ instanceId, refreshTick }: Props) {
           }
         />
         <Signal
-          label="Elect-Marker fehlen"
+          label={t("Elect markers missing")}
           value={d.drift.elect_markers_missing}
-          unit={`von ${d.drift.elect_window}`}
+          unit={t("of {n}", { n: d.drift.elect_window })}
           level={
             d.drift.elect_markers_missing >= d.drift.elect_window / 2
               ? "amber"
@@ -200,7 +206,7 @@ export function Dashboard({ instanceId, refreshTick }: Props) {
       </Card>
 
       {/* Network */}
-      <Card title="Network">
+      <Card title={t("Network")}>
         <div className="flex items-center gap-2">
           <span
             className={`px-2 py-0.5 text-xs font-mono rounded border ${
@@ -211,37 +217,37 @@ export function Dashboard({ instanceId, refreshTick }: Props) {
           </span>
           {d.drift.network_access === "gated" && (
             <span className="text-[11px] text-neutral-400">
-              {d.drift.network_allowlist_len} host(s)
+              {t("{n} host(s)", { n: d.drift.network_allowlist_len })}
             </span>
           )}
         </div>
         <div className="mt-2 text-[11px] text-neutral-500 leading-relaxed">
           {d.drift.network_access === "off" &&
-            "Sandbox verweigert jegliches Netz. Tools sind vollständig isoliert."}
+            t("Sandbox denies all networking. Tools are fully isolated.")}
           {d.drift.network_access === "gated" &&
-            "Sandbox erlaubt TCP 80/443 nur zu den Allowlisted-Hosts."}
+            t("Sandbox allows TCP 80/443 only to the allowlisted hosts.")}
           {d.drift.network_access === "open" &&
-            "Sandbox-Firewall aus. Tools haben rohen Netzzugriff."}
+            t("Sandbox firewall off. Tools have raw network access.")}
         </div>
       </Card>
 
       {/* Activity */}
-      <Card title="Aktivität">
-        <KV label="Tools">{d.toolCount}</KV>
-        <KV label="Stimuli inbox">{d.inboxCount}</KV>
-        <KV label="Standing concerns">{d.standingCount}</KV>
-        <KV label="Outbox">{d.outboxCount}</KV>
-        <KV label="Processed archive">{d.processedCount}</KV>
+      <Card title={t("Activity")}>
+        <KV label={t("Tools")}>{d.toolCount}</KV>
+        <KV label={t("Stimuli inbox")}>{d.inboxCount}</KV>
+        <KV label={t("Standing concerns")}>{d.standingCount}</KV>
+        <KV label={t("Outbox")}>{d.outboxCount}</KV>
+        <KV label={t("Processed archive")}>{d.processedCount}</KV>
       </Card>
 
       {/* Warnings (non-fatal) — always present, even if empty, for layout stability */}
       <Card
-        title="Warnings"
+        title={t("Warnings")}
         accent={d.invariants.report.warnings.length > 0 ? "amber" : undefined}
       >
         {d.invariants.report.warnings.length === 0 ? (
           <div className="text-[11px] text-neutral-500">
-            Keine non-fatalen Warnungen.
+            {t("No non-fatal warnings.")}
           </div>
         ) : (
           <ul className="space-y-1.5">
