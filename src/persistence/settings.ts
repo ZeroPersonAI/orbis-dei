@@ -1,5 +1,5 @@
-// Port of src-tauri/src/persistence/settings.rs. Settings live in the `settings`
-// key/value table; lists are newline-joined, booleans are "true"/"false".
+// Settings live in the `settings` key/value table; lists are newline-joined,
+// booleans are "true"/"false".
 import type { DB } from "./db.ts";
 
 export interface Settings {

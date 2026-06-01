@@ -1,5 +1,5 @@
-// Port of src-tauri/src/core/auto_mode.rs — the operator-agent. Two gated
-// behaviours: auto-reply to new outbox messages and periodic auto-stimulus.
+// The operator-agent. Two gated behaviours: auto-reply to new outbox messages
+// and periodic auto-stimulus.
 // Both write only into stimuli/ via injectStimulus (the operator carve-out).
 import * as fs from "node:fs";
 import * as path from "node:path";

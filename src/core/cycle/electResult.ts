@@ -1,5 +1,4 @@
-// Port of src-tauri/src/core/cycle/elect_result.rs — Phase 8 elect-phase drift
-// detection.
+// Phase 8 elect-phase drift detection.
 //
 // The elect template asks the model to append a trailing marker
 // `<!-- ELECT_RESULT: accepted=N, rejected=M -->` so the app can track SC-004
@@ -56,7 +55,7 @@ function extractU32(line: string, key: string): number | null {
   // Take the leading run of ascii digits.
   let end = 0;
   while (end < rest.length && rest[end] >= "0" && rest[end] <= "9") end++;
-  if (end === 0) return null; // empty parse → Rust's parse() fails
+  if (end === 0) return null; // no digits → not a valid count
   const digits = rest.slice(0, end);
   const n = parseInt(digits, 10);
   if (Number.isNaN(n)) return null;
@@ -130,7 +129,7 @@ function readOrDefault(p: string): string {
   }
 }
 
-/** Parse like Rust's `str::parse::<i64>()`: full string must be a valid integer. */
+/** Parse strictly: the full string must be a valid integer. */
 function parseIntStrict(s: string): number | null {
   if (!/^[+-]?\d+$/.test(s)) return null;
   const n = parseInt(s, 10);

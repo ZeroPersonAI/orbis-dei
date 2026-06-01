@@ -1,5 +1,4 @@
-// Port of src-tauri/src/core/cycle/expand_log.rs — parse historical
-// `loop-NNNNN-expand.md` files into structured records.
+// Parse historical `loop-NNNNN-expand.md` files into structured records.
 //
 // Phase 12 and 13 both need to inspect what the Expand phase actually did per
 // loop: which tools ran, what their exit codes were, what network policy was in
@@ -194,7 +193,7 @@ function parseExit(rest: string): [number | null, boolean] {
   return [null, false];
 }
 
-// --- helpers mirroring Rust string semantics ---
+// --- string helpers ---
 
 function trimStart(s: string): string {
   return s.replace(/^\s+/, "");
@@ -204,21 +203,21 @@ function trimEnd(s: string): string {
   return s.replace(/\s+$/, "");
 }
 
-/** Rust `trim_end_matches(c)` — strip every trailing occurrence of `c`. */
+/** Strip every trailing occurrence of `c`. */
 function trimEndMatches(s: string, c: string): string {
   let end = s.length;
   while (end > 0 && s[end - 1] === c) end--;
   return s.slice(0, end);
 }
 
-/** Rust `trim_start_matches(set)` — strip leading chars in `set`. */
+/** Strip leading chars in `set`. */
 function trimStartMatchesChars(s: string, set: string[]): string {
   let start = 0;
   while (start < s.length && set.includes(s[start])) start++;
   return s.slice(start);
 }
 
-/** Parse like Rust's `str::parse::<i64>()`: whole string must be an integer. */
+/** Parse strictly: the whole string must be an integer. */
 function parseIntStrict(s: string): number | null {
   if (!/^[+-]?\d+$/.test(s)) return null;
   const n = parseInt(s, 10);

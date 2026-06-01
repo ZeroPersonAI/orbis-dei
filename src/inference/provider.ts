@@ -1,6 +1,5 @@
-// Port of src-tauri/src/inference/provider.rs — provider-agnostic chat routing.
-// `ProviderClient` is a discriminated union (not a trait) so the governor can
-// drive any provider through one `chat()` entry point.
+// Provider-agnostic chat routing. `ProviderClient` is a discriminated union so
+// the governor can drive any provider through one `chat()` entry point.
 
 import { type AppError, invalidInput } from "../error.ts";
 import { AnthropicClient } from "./anthropic.ts";

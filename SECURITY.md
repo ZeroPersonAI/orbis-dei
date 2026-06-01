@@ -1,7 +1,7 @@
 # Security
 
-Orbis Dei (Node.js server edition) is research software. It is **not** vetted
-for production use and runs LLM-generated code under a best-effort sandbox. The
+Orbis Dei is research software. It is **not** vetted for production use and runs
+LLM-generated code under a best-effort sandbox. The
 honest stance: residual risk is real, the threat model is documented, and
 security findings are taken seriously.
 
@@ -14,7 +14,7 @@ a fix is in place.
 
 ## Server exposure (read this first)
 
-This edition exposes the former Tauri commands as an **HTTP + WebSocket API**
+Orbis Dei exposes its commands as an **HTTP + WebSocket API**
 (`POST /api/command/<name>`, events over `/ws`). The API is **unauthenticated**
 and intended to bind to **localhost** for a single local operator.
 

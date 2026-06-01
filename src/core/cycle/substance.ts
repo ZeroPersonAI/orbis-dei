@@ -1,4 +1,4 @@
-// Port of the SubstanceMetrics logic from src-tauri/src/core/cycle/mod.rs.
+// SubstanceMetrics logic.
 // SC-001: a phase passes if it produced enough substantive work, measured by
 // non-empty/non-decoration lines OR total non-whitespace chars.
 

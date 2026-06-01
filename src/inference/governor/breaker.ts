@@ -1,4 +1,4 @@
-// Port of src-tauri/src/inference/governor/breaker.rs — circuit breaker for 429s.
+// Circuit breaker for 429s.
 //
 // - Closed: normal operation, every 429 timestamp is appended to a sliding window.
 // - Open: when >= THRESHOLD timestamps land within WINDOW, we open for COOL_DOWN.

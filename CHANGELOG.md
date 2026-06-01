@@ -7,20 +7,18 @@ yet tag releases.
 ## [Unreleased]
 
 ### Added
-- Initial Node.js server edition: a faithful TypeScript port of the Orbis Dei
-  Tauri/Rust habitat.
-  - Express + WebSocket host; all 47 commands as `POST /api/command/<name>`,
-    events broadcast over `/ws`.
+- Initial release of the Orbis Dei habitat server.
+  - Express + WebSocket host; commands as `POST /api/command/<name>`, events
+    broadcast over `/ws`.
   - Six-phase metabolic loop, governor (pricing / rate-limit buckets / circuit
     breaker / budget / weighted-fair queue), orchestrator (daemons + boredom +
     auto-resume), auto-mode operator agent, stimulus system, telemetry chat,
     optional Telegram bot.
-  - Substitutions vs. the original: `better-sqlite3` (same schema), system
-    `git`, AES-256-GCM encrypted secret store, `chokidar` file watching. macOS
-    `sandbox-exec` kept for tool execution; refused (not run unsandboxed) on
-    other platforms.
-  - React frontend reused verbatim except `web/src/lib/transport.ts`, which
-    re-implements `invoke`/`listen` over HTTP + WebSocket.
+  - Persistence via `better-sqlite3`, system `git`, an AES-256-GCM encrypted
+    secret store, and `chokidar` file watching. Tool execution is sandboxed with
+    macOS `sandbox-exec` (refused, not run unsandboxed, on other platforms).
+  - React frontend talking to the backend through `web/src/lib/transport.ts`
+    (`invoke`/`listen` over HTTP + WebSocket).
 - Global `unhandledRejection` / `uncaughtException` handlers so a background
   daemon or auto-mode error logs a stack trace instead of silently exiting.
 

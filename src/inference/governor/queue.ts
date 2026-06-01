@@ -1,5 +1,4 @@
-// Port of src-tauri/src/inference/governor/queue.rs — weighted fair queue across
-// instances.
+// Weighted fair queue across instances.
 //
 // Classic virtual-time WFQ. Each call is assigned a virtual finish time
 // `start + 1/weight`, where `start` is the later of the global virtual clock and
@@ -7,9 +6,9 @@
 // virtual-finish order, one at a time. An idle instance can't bank credit — its
 // `start` jumps forward to the current virtual clock.
 //
-// The Rust uses tokio Mutex + Notify. JS is single-threaded and cooperative, so
-// the "lock" is implicit between awaits; we replace `Notify` with a set of
-// pending waker callbacks that we resolve on `release`.
+// JS is single-threaded and cooperative, so the "lock" is implicit between
+// awaits; waiters are woken via a set of pending waker callbacks resolved on
+// `release`.
 
 interface Waiter {
   seq: number;
@@ -30,7 +29,7 @@ export class Queue {
   private seq = 0;
 
   // Wakers for tasks parked in `acquire`. Resolving one lets that loop re-check
-  // the head condition — the JS equivalent of tokio's `notify_waiters()`.
+  // the head condition (a notify-all of waiters).
   private wakers: Array<() => void> = [];
 
   /** Set an instance's weight. Default (unset) is 1.0. Higher = more throughput. */
@@ -68,7 +67,7 @@ export class Queue {
 
     for (;;) {
       // Register the waker BEFORE checking the condition, so a notify between the
-      // check and the await is not missed (mirrors the Rust ordering).
+      // check and the await is not missed.
       const notified = this.nextWake();
       const head = this.headWaiter();
       const isHead = head !== null && head.seq === mySeq;
@@ -81,8 +80,8 @@ export class Queue {
     }
   }
 
-  // Kept `async` for call-site symmetry with the Rust `release`; the body is
-  // synchronous because JS is single-threaded between awaits.
+  // Kept `async` for call-site symmetry with `acquire`; the body is synchronous
+  // because JS is single-threaded between awaits.
   async release(ticket: Ticket): Promise<void> {
     this.running = Math.max(0, this.running - 1);
     this.virtualClock = Math.max(this.virtualClock, ticket.virtualFinish);

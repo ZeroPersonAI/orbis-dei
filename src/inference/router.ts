@@ -1,10 +1,9 @@
-// Port of src-tauri/src/inference/router.rs — per-phase provider routing. Each
-// instance maps the six loop phases to a provider (Anthropic | OpenAI | Gemini);
-// the model for each provider comes from global settings. Every call is governed
-// (budget / rate-limits / breaker).
+// Per-phase provider routing. Each instance maps the six loop phases to a
+// provider (Anthropic | OpenAI | Gemini); the model for each provider comes from
+// global settings. Every call is governed (budget / rate-limits / breaker).
 //
-// Difference from the Rust: `call()` takes a `DB` directly (not an AppState),
-// matching the synchronous better-sqlite3 persistence layer.
+// `call()` takes a `DB` directly (not an AppState), matching the synchronous
+// better-sqlite3 persistence layer.
 
 import { internal, missingConfig } from "../error.ts";
 import type { DB } from "../persistence/db.ts";
@@ -21,7 +20,7 @@ import type { ChatResponse, Phase } from "./index.ts";
 
 /**
  * Everything `Router.build` needs, assembled by the caller from Settings +
- * keychain. Keeps `inference` decoupled from `persistence`.
+ * the secret store. Keeps `inference` decoupled from `persistence`.
  */
 export interface RouterConfig {
   routingMode: string;

@@ -1,5 +1,5 @@
-// Cooperative cancellation, replacing tokio_util::sync::CancellationToken.
-// A daemon signals cancel() at a phase boundary; the cycle checks isCancelled.
+// Cooperative cancellation. A daemon signals cancel() at a phase boundary; the
+// cycle checks isCancelled.
 export class CancellationToken {
   private cancelled = false;
   private waiters: (() => void)[] = [];

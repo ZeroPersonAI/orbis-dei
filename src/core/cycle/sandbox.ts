@@ -1,5 +1,4 @@
-// Port of src-tauri/src/core/cycle/sandbox.rs — sandboxed execution of
-// organism-built tools via macOS `sandbox-exec`.
+// Sandboxed execution of organism-built tools via macOS `sandbox-exec`.
 //
 // The profile denies network access and confines writes to the instance
 // directory (plus the system temp dirs). A timeout kills runaway scripts. If
@@ -147,7 +146,7 @@ export async function runSandboxed(
   });
 }
 
-/** Cap captured output at MAX_CAPTURE bytes (byte-accurate, like Rust). */
+/** Cap captured output at MAX_CAPTURE bytes (byte-accurate). */
 function cap(buf: Buffer): string {
   if (buf.length <= MAX_CAPTURE) {
     return buf.toString("utf8");

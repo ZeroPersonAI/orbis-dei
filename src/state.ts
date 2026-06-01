@@ -1,7 +1,6 @@
-// Port of src-tauri/src/state.rs — the shared application state. The Tauri
-// AppHandle's roles are split here: `events` replaces `app.emit`, `db` is the
-// better-sqlite3 connection (single-threaded, no mutex needed), `secrets`
-// replaces the OS keychain.
+// The shared application state. `events` is the in-process event bus, `db` is
+// the better-sqlite3 connection (single-threaded, no mutex needed), `secrets`
+// is the encrypted API-key store.
 import * as fs from "node:fs";
 import * as path from "node:path";
 import * as os from "node:os";
@@ -18,8 +17,8 @@ export interface ViewerWatcher {
   close: () => void;
 }
 
-/** Resolve the habitat data dir. Mirrors the Rust `BaseDirs::data_dir()/OrbisDei`
- *  but allows ORBIS_DATA_DIR override (useful for the server / tests). */
+/** Resolve the habitat data dir: the platform's per-user data directory plus
+ *  /OrbisDei, with an ORBIS_DATA_DIR override (useful for the server / tests). */
 export function habitatDataDir(): string {
   const override = process.env.ORBIS_DATA_DIR;
   if (override && override.length > 0) return override;

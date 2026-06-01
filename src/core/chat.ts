@@ -1,5 +1,5 @@
-// Port of src-tauri/src/commands/chat.rs — chat over telemetry. The model is a
-// read-only window into the instance's files via tool calls; never the voice of
+// Chat over telemetry. The model is a read-only window into the instance's
+// files via tool calls; never the voice of
 // the organism. Every tool here is read-only.
 import * as fs from "node:fs";
 import * as path from "node:path";

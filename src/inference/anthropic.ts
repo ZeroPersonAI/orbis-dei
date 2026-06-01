@@ -1,6 +1,5 @@
-// Port of src-tauri/src/inference/anthropic.rs — Anthropic Messages API client
-// with prompt-caching breakpoints, a retry policy for transient failures, and a
-// tool-use chat mode.
+// Anthropic Messages API client with prompt-caching breakpoints, a retry policy
+// for transient failures, and a tool-use chat mode.
 
 import { AppError, internal, rateLimited } from "../error.ts";
 import { type ChatResponse, DEFAULT_MAX_TOKENS } from "./index.ts";
@@ -17,7 +16,7 @@ export const ANTHROPIC_VERSION = "2023-06-01";
  */
 const MAX_RETRIES = 3;
 
-/** Request timeout in milliseconds (matches the Rust 600s reqwest timeout). */
+/** Request timeout in milliseconds (600s). */
 const REQUEST_TIMEOUT_MS = 600_000;
 
 /** attempt=1 → 1s, attempt=2 → 3s, attempt=3 → 9s, capped at 30s. */
@@ -41,7 +40,7 @@ function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-// --- Response shape (mirrors the serde structs) ---------------------------
+// --- Response shape -------------------------------------------------------
 
 interface ContentBlock {
   type: string;
@@ -175,8 +174,8 @@ export class AnthropicClient {
         signal: controller.signal,
       });
     } catch (e) {
-      // Network / fetch / abort failure — transient, formatted to match the
-      // Rust "anthropic request:" prefix so the retry classifier picks it up.
+      // Network / fetch / abort failure — transient, formatted with the
+      // "anthropic request:" prefix so the retry classifier picks it up.
       throw internal(`anthropic request: ${e instanceof Error ? e.message : String(e)}`);
     } finally {
       clearTimeout(timer);

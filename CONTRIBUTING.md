@@ -1,9 +1,8 @@
 # Contributing
 
 Thanks for considering a contribution. Orbis Dei is research-grade software —
-small, careful, and explicit about its limits. This edition is a Node.js server
-port of the original Tauri/Rust app; the backend logic was ported faithfully,
-so when in doubt the original's behaviour is the reference.
+small, careful, and explicit about its limits. Please read this short note first
+so the shape of the project stays coherent.
 
 ## Setup
 
@@ -30,12 +29,12 @@ the loop still works with tool execution off (the default).
 
 - **TypeScript**: keep `npm run typecheck` (`tsc --noEmit`) clean. ESM modules,
   explicit `.ts` import extensions, `fetch` over HTTP libraries.
-- **Frontend**: React 19 + Tailwind 4. Mimic the closest existing component.
-  Only the transport layer (`web/src/lib/transport.ts`) and the four files that
-  import it differ from the original — keep that seam thin.
-- **Faithful port.** If you change loop / inference / governor behaviour, check
-  it against the Rust original's semantics. Marker strings, thresholds, and the
-  episodic file format are a contract other modules parse.
+- **Frontend**: React 19 + Tailwind 4. Mimic the closest existing component. The
+  transport layer (`web/src/lib/transport.ts`) is the only seam to the backend —
+  keep it thin.
+- **Behavioural contracts.** Marker strings, thresholds, and the episodic file
+  format are a contract other modules parse — change loop / inference / governor
+  behaviour deliberately, with the parsers in mind.
 - **Comments**: only where the *why* is non-obvious.
 - **Tests / verification**: for non-trivial logic, exercise it end-to-end
   against the running server (create an instance, run a loop). Note what you ran

@@ -1,4 +1,4 @@
-// Port of src-tauri/src/persistence/fs.rs — InstancePaths + atomic writes.
+// InstancePaths + atomic writes.
 import { promises as fsp } from "node:fs";
 import * as fs from "node:fs";
 import * as path from "node:path";

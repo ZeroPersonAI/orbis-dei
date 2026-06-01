@@ -1,6 +1,5 @@
-// Port of src-tauri/src/inference/governor/pricing.rs — static per-model pricing
-// (USD per 1M tokens). Unknown models default to Opus-4 pricing as a
-// conservative cap.
+// Static per-model pricing (USD per 1M tokens). Unknown models default to
+// Opus-4 pricing as a conservative cap.
 
 export interface ModelPricing {
   /** USD per 1,000,000 input tokens (no cache). */

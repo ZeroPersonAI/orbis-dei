@@ -1,5 +1,4 @@
-// Port of src-tauri/src/inference/governor/budget.rs — daily / monthly budget
-// aggregation, sourced from `inference_calls`.
+// Daily / monthly budget aggregation, sourced from `inference_calls`.
 //
 // We compare with `>=` on the date prefix of `created_at`. ISO timestamps sort
 // lexicographically, so "created_at >= 'YYYY-MM-DD'" matches everything from

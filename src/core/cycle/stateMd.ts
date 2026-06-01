@@ -1,5 +1,5 @@
-// Port of src-tauri/src/core/cycle/state_md.rs — state.md counter/phase mutation
-// and the integrate-phase narrative split/rebuild logic.
+// state.md counter/phase mutation and the integrate-phase narrative
+// split/rebuild logic.
 
 import * as fs from "node:fs";
 
@@ -133,7 +133,7 @@ export function rebuildWithNarrative(
 ): void {
   const current = readOrDefault(statePath);
   const geburtstag = extractField(current, "Geburtstag") ?? nowRfc;
-  const host = extractField(current, "Wirt") ?? "Habitat-App (Tauri)";
+  const host = extractField(current, "Wirt") ?? "Orbis Dei Habitat";
 
   const content =
     `# State — Loop ${newCounter}\n` +
@@ -163,7 +163,7 @@ export function extractField(content: string, field: string): string | null {
   return null;
 }
 
-// --- string helpers mirroring Rust's trim_end / trim_start semantics ---
+// --- string helpers for trim_end / trim_start semantics ---
 
 function trimEnd(s: string): string {
   return s.replace(/\s+$/, "");

@@ -4,7 +4,7 @@
 - Loop-Counter: 1
 - Geburtstag: {{created_at}}
 - Letzte Phase: bootstrap
-- Wirt: Habitat-App (Tauri)
+- Wirt: Orbis Dei Habitat
 
 ## Selbstzustand
 Frisch geborene Instanz. Erste reguläre Iteration steht aus.

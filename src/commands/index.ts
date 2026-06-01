@@ -1,7 +1,7 @@
-// Maps the 47 Tauri command names to handlers over AppState. The HTTP layer
+// Maps the 47 command names to handlers over AppState. The HTTP layer
 // dispatches `POST /api/command/<name>` here; the WebSocket layer relays events.
 // Args arrive as the same camelCase object the frontend's `invoke(name, args)`
-// produced, so field access mirrors tauri-bindings.ts exactly.
+// produced, so field access matches the frontend's bindings exactly.
 import * as fs from "node:fs";
 import * as path from "node:path";
 import { execFile } from "node:child_process";

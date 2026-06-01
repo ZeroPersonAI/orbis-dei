@@ -1,4 +1,4 @@
-// Port of src-tauri/src/inference/openai.rs — OpenAI-compatible chat client.
+// OpenAI-compatible chat client.
 // Used for BOTH OpenAI and Google Gemini (Gemini exposes an OpenAI-compatible
 // endpoint at https://generativelanguage.googleapis.com/v1beta/openai).
 //
@@ -51,7 +51,7 @@ export class OpenAiClient {
    */
   async chat(model: string, system: string, user: string): Promise<ChatResponse> {
     let attempt = 0;
-    // Mirrors the Rust loop: attempt starts at 1, retries while <= MAX_RETRIES.
+    // attempt starts at 1, retries while <= MAX_RETRIES.
     for (;;) {
       attempt += 1;
       try {

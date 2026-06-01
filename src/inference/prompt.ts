@@ -1,5 +1,5 @@
-// Port of src-tauri/src/inference/prompt.rs — builds the split prompt
-// (system / stableUser / dynamicUser) for a phase from the instance's on-disk
+// Builds the split prompt (system / stableUser / dynamicUser) for a phase from
+// the instance's on-disk
 // corpus. Marker strings and section headers are reproduced verbatim because
 // the Expand/Elect/Review/Integrate parsers depend on them.
 import * as fs from "node:fs";

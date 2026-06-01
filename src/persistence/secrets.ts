@@ -1,6 +1,5 @@
-// Replaces src-tauri/src/persistence/keychain.rs. The Tauri app stored API keys
-// in the OS keychain; a headless server has no keychain, so we persist them in
-// an AES-256-GCM encrypted file inside the data dir. The encryption key is
+// Persists API keys in an AES-256-GCM encrypted file inside the data dir. The
+// encryption key is
 // derived from a machine secret (ORBIS_SECRET env var, else a random key file
 // created with 0600 perms). This keeps keys off plaintext disk while remaining
 // dependency-free.

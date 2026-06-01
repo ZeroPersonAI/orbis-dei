@@ -1,5 +1,5 @@
-// Port of src-tauri/src/watch.rs — watches an instance's corpus/ dir and emits
-// a debounced `corpus:changed` event. notify → chokidar.
+// Watches an instance's corpus/ dir with chokidar and emits a debounced
+// `corpus:changed` event.
 import chokidar, { type FSWatcher } from "chokidar";
 import type { EventBus } from "./events.ts";
 

@@ -1,11 +1,9 @@
-// Port of src-tauri/src/inference/governor/buckets.rs — token buckets for
-// Anthropic rate-limits: RPM, ITPM, OTPM.
+// Token buckets for Anthropic rate-limits: RPM, ITPM, OTPM.
 //
-// The Rust uses the `governor` crate's leaky/token-bucket limiter. Here we
-// implement a simple continuous-refill token bucket per dimension: capacity =
-// the per-minute rate, refill rate = rate/60 tokens per second. `acquire`
-// awaits until enough capacity is available across all three dimensions, then
-// debits them. Non-busy: it polls with a small setTimeout when it has to wait.
+// A simple continuous-refill token bucket per dimension: capacity = the
+// per-minute rate, refill rate = rate/60 tokens per second. `acquire` awaits
+// until enough capacity is available across all three dimensions, then debits
+// them. Non-busy: it polls with a small setTimeout when it has to wait.
 
 export interface BucketSettings {
   rpm: number;
@@ -48,8 +46,8 @@ class TokenBucket {
   tryAcquire(n: number): boolean {
     this.refill();
     // A request can never need more than the bucket's whole capacity; clamp the
-    // demand so an over-large reservation cannot deadlock forever (mirrors the
-    // `governor` crate, which caps n at the burst capacity).
+    // demand so an over-large reservation cannot deadlock forever (cap n at the
+    // burst capacity).
     const need = Math.min(n, this.capacity);
     if (this.tokens >= need) {
       this.tokens -= need;
@@ -82,8 +80,8 @@ export class Buckets {
 
   /**
    * Wait until one request slot, `estIn` input tokens, and `estOut` output
-   * tokens are all available, then debit them. Mirrors the Rust ordering:
-   * request slot first, then input tokens, then output tokens.
+   * tokens are all available, then debit them. Ordering: request slot first,
+   * then input tokens, then output tokens.
    */
   async acquire(estIn: number, estOut: number): Promise<void> {
     while (!this.requests.tryAcquire(1)) {

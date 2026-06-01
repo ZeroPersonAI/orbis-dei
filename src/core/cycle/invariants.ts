@@ -1,6 +1,5 @@
-// Port of src-tauri/src/core/cycle/invariants.rs — mechanical SP-I / SC
-// enforcement run during the Review phase. Uses `git status --porcelain`
-// (via persistence/git.ts) instead of git2 to detect divergence from HEAD.
+// Mechanical SP-I / SC enforcement run during the Review phase. Uses
+// `git status --porcelain` (via persistence/git.ts) to detect divergence from HEAD.
 import * as fs from "node:fs";
 import * as path from "node:path";
 import { InstancePaths, writeAtomic } from "../../persistence/fs.ts";

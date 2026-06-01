@@ -1,5 +1,4 @@
-// Port of src-tauri/src/core/cycle/expand_io.rs — Expand-phase real-world
-// effects: FILE_WRITE blocks and TOOL_RUN markers.
+// Expand-phase real-world effects: FILE_WRITE blocks and TOOL_RUN markers.
 //
 // The Expand phase model embeds these in its output. The loop driver extracts
 // them, validates paths against a writable-subtree allowlist, applies the
@@ -317,12 +316,12 @@ export async function processExpand(
   return out;
 }
 
-/** Mirror Rust's `{:?}` on `Option<i32>`: `Some(N)` or `None`. */
+/** Format an exit code as `Some(N)` or `None`. */
 function formatExit(code: number | null): string {
   return code === null ? "None" : `Some(${code})`;
 }
 
-/** Render an error the way Rust's `AppError` Display impl would. */
+/** Render an error using `AppError`'s display string when available. */
 function appErrorDisplay(e: unknown): string {
   if (e && typeof (e as any).toDisplay === "function") {
     return (e as any).toDisplay();
@@ -331,7 +330,7 @@ function appErrorDisplay(e: unknown): string {
   return String(e);
 }
 
-/** Rust `str::trim_matches('\n')` — strip leading/trailing newlines only. */
+/** Strip leading/trailing newlines only. */
 function trimMatchesNewline(s: string): string {
   let start = 0;
   let end = s.length;

@@ -1,6 +1,5 @@
-// Port of src-tauri/src/core/orchestrator.rs — per-instance background loops.
-// JS is single-threaded, so the handles map needs no mutex; the TOCTOU guard
-// the Rust achieved with a lock is automatic between awaits here.
+// Per-instance background loops. JS is single-threaded, so the handles map
+// needs no mutex; the TOCTOU guard is automatic between awaits here.
 import type { AppState } from "../state.ts";
 import { runOneCycle } from "./cycle/index.ts";
 import * as instance from "./instance.ts";
@@ -66,7 +65,7 @@ export class Orchestrator {
     // is already gone, so cancellation of an in-flight cycle only propagates at
     // the next phase boundary — too slow to drive the button. (daemonBody may
     // emit a second, identical daemon:stopped when it actually unwinds; the UI
-    // treats both as idempotent "running = false".) Mirrors pauseAll().
+    // treats both as idempotent "running = false".) Matches pauseAll().
     this.state.events.emit("daemon:stopped", { instance_id: instanceId, reason: "manual" });
   }
 

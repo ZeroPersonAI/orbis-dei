@@ -1,6 +1,5 @@
-// Port of src-tauri/src/persistence/git.rs using the system `git` binary
-// (replaces the git2 crate). All operations are synchronous child processes,
-// matching the original's blocking semantics inside the loop.
+// Git operations using the system `git` binary. All operations are synchronous
+// child processes, giving blocking semantics inside the loop.
 import { execFileSync } from "node:child_process";
 import * as fs from "node:fs";
 import { AppError } from "../error.ts";

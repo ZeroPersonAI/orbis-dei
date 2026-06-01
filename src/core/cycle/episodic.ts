@@ -1,11 +1,11 @@
-// Port of src-tauri/src/core/cycle/episodic.rs — episodic phase-file paths and writes.
+// Episodic phase-file paths and writes.
 
 import * as path from "node:path";
 
 import { InstancePaths, writeAtomic } from "../../persistence/fs.ts";
 import type { Phase } from "../../inference/index.ts";
 
-/** Zero-pad to 5 digits to match Rust's `{:05}`. */
+/** Zero-pad to 5 digits. */
 function pad5(n: number): string {
   const neg = n < 0;
   const digits = Math.abs(n).toString();

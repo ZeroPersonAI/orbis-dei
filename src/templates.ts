@@ -1,6 +1,5 @@
-// Port of src-tauri/src/core/templates.rs. The Rust app embedded these at
-// compile time with include_str!; here we read them once from assets/templates
-// at startup and cache the strings.
+// Bootstrap templates. They are read once from assets/templates at startup and
+// the strings are cached.
 import * as fs from "node:fs";
 import * as path from "node:path";
 import { fileURLToPath } from "node:url";

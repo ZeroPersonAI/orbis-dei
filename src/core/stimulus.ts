@@ -1,5 +1,5 @@
-// Port of src-tauri/src/commands/stimulus.rs — operator stimulus injection +
-// listings + outbox threads. Pure functions over AppState so commands, the
+// Operator stimulus injection + listings + outbox threads. Pure functions over
+// AppState so commands, the
 // auto-mode operator, and the Telegram bot can all call them.
 import * as fs from "node:fs";
 import * as path from "node:path";
@@ -39,7 +39,7 @@ export function slugify(title: string): string {
 }
 
 function stampCompact(d: Date): string {
-  // UTC YYYYMMDD-HHMMSS, mirroring chrono's Utc::now().format("%Y%m%d-%H%M%S").
+  // UTC YYYYMMDD-HHMMSS.
   const p = (n: number, w = 2) => String(n).padStart(w, "0");
   return (
     `${d.getUTCFullYear()}${p(d.getUTCMonth() + 1)}${p(d.getUTCDate())}` +

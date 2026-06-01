@@ -1,7 +1,6 @@
-// Replaces Tauri's `app.emit(name, payload)`. A tiny pub/sub bus that the
-// WebSocket server subscribes to and forwards verbatim to every connected
-// browser. Event names + payload shapes are identical to the Tauri originals
-// so the frontend's listeners work unchanged.
+// A tiny pub/sub bus that the WebSocket server subscribes to and forwards
+// verbatim to every connected browser. Event names + payload shapes match the
+// frontend's listeners.
 
 export interface OrbisEvent {
   event: string;

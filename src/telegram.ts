@@ -1,5 +1,5 @@
-// Port of src-tauri/src/telegram.rs — optional read-only conversational bot
-// with an inline "inject as stimulus" button. Long-polls getUpdates, routes
+// Optional read-only conversational bot with an inline "inject as stimulus"
+// button. Long-polls getUpdates, routes
 // text through the same chat-over-telemetry path as the Observe tab, and is
 // gated by telegram_enabled + a token in the secret store. Bails out cheaply
 // when disabled, so spawnTelegram() is always safe to call at boot.

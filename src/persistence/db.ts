@@ -1,5 +1,4 @@
-// Port of src-tauri/src/persistence/db.rs — SQLite schema + migrations.
-// Uses better-sqlite3 (synchronous, matching rusqlite's blocking API).
+// SQLite schema + migrations. Uses better-sqlite3 (synchronous, blocking API).
 import Database from "better-sqlite3";
 
 export type DB = Database.Database;

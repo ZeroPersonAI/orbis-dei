@@ -1,13 +1,11 @@
-// HTTP + WebSocket transport that replaces @tauri-apps/api. `invoke` posts to
-// the Node server's command endpoint; `listen` subscribes to a shared WS that
-// relays the server's EventBus. The signatures match Tauri's so the rest of
-// the frontend (tauri-bindings.ts + the event hooks) needs no logic changes —
-// only their import lines point here instead of at @tauri-apps.
+// HTTP + WebSocket transport: `invoke` posts to the server's command endpoint;
+// `listen` subscribes to a shared WebSocket that relays the server's EventBus.
+// The signatures match the frontend's existing `invoke`/`listen` usage.
 
 export type UnlistenFn = () => void;
 
-/** Mirrors Tauri's `invoke<T>(cmd, args)`: resolves the value or rejects with
- *  the server's error string (so existing `String(e)` handlers behave the same). */
+/** `invoke<T>(cmd, args)`: resolves the value or rejects with the server's error
+ *  string (so existing `String(e)` handlers behave the same). */
 export async function invoke<T>(cmd: string, args?: Record<string, unknown>): Promise<T> {
   const res = await fetch(`/api/command/${cmd}`, {
     method: "POST",
@@ -21,7 +19,7 @@ export async function invoke<T>(cmd: string, args?: Record<string, unknown>): Pr
     throw `request failed (${res.status})`;
   }
   if (!res.ok) {
-    // Reject with the bare string, like Tauri's invoke does.
+    // Reject with the bare string.
     throw typeof body?.error === "string" ? body.error : `request failed (${res.status})`;
   }
   return body.value as T;
@@ -29,12 +27,12 @@ export async function invoke<T>(cmd: string, args?: Record<string, unknown>): Pr
 
 // ---- shared WebSocket event bus --------------------------------------------
 
-interface TauriEvent<T> {
+interface ServerEvent<T> {
   event: string;
   payload: T;
 }
 
-type Handler = (e: TauriEvent<unknown>) => void;
+type Handler = (e: ServerEvent<unknown>) => void;
 
 const handlers = new Map<string, Set<Handler>>();
 let socket: WebSocket | null = null;
@@ -48,7 +46,7 @@ function ensureSocket(): void {
   socket = new WebSocket(`${proto}://${location.host}/ws`);
 
   socket.onmessage = (ev) => {
-    let msg: TauriEvent<unknown>;
+    let msg: ServerEvent<unknown>;
     try {
       msg = JSON.parse(ev.data);
     } catch {
@@ -72,10 +70,10 @@ function ensureSocket(): void {
   };
 }
 
-/** Mirrors Tauri's `listen<T>(event, handler)`. */
+/** `listen<T>(event, handler)`. */
 export async function listen<T>(
   event: string,
-  handler: (e: TauriEvent<T>) => void,
+  handler: (e: ServerEvent<T>) => void,
 ): Promise<UnlistenFn> {
   let set = handlers.get(event);
   if (!set) {

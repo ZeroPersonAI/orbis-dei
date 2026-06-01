@@ -1,6 +1,6 @@
-// Port of src-tauri/src/error.rs — a single error type carrying a kind + message.
+// A single error type carrying a kind + message.
 // The HTTP layer serialises these as { error: "<kind>: <message>" } to match the
-// string-error contract the Tauri frontend already expects.
+// string-error contract the frontend expects.
 
 export type AppErrorKind =
   | "io"
@@ -29,7 +29,7 @@ export class AppError extends Error {
     return this.kind === "cancelled";
   }
 
-  /** Human string matching the Rust `Display` impl, e.g. "not found: foo". */
+  /** Human-readable string, e.g. "not found: foo". */
   toDisplay(): string {
     switch (this.kind) {
       case "io":

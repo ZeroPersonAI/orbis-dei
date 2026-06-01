@@ -1,6 +1,6 @@
-// HTTP + WebSocket server. Replaces the Tauri host:
-//  - each Tauri command  → POST /api/command/<name>  (JSON body = invoke args)
-//  - each Tauri event    → broadcast over /ws         ({ event, payload })
+// HTTP + WebSocket server:
+//  - each command  → POST /api/command/<name>  (JSON body = invoke args)
+//  - each event    → broadcast over /ws         ({ event, payload })
 //  - the bundled frontend → served from web/dist
 import express from "express";
 import { createServer } from "node:http";
@@ -45,7 +45,7 @@ async function main() {
     }
     try {
       const value = await handler(req.body ?? {}, state);
-      // `undefined` (void commands) serialises to null, matching Rust's `()`.
+      // `undefined` (void commands) serialises to null.
       res.json({ value: value === undefined ? null : value });
     } catch (e) {
       const err: AppError = toAppError(e);

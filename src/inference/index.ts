@@ -1,9 +1,9 @@
-// Port of src-tauri/src/inference/mod.rs — shared inference types.
+// Shared inference types.
 
 /** The six loop phases, in execution order. */
 export type Phase = "observe" | "diverge" | "elect" | "expand" | "review" | "integrate";
 
-/** All phases in order — mirrors `Phase::ALL` in the Rust. */
+/** All phases in order. */
 export const PHASES: Phase[] = [
   "observe",
   "diverge",

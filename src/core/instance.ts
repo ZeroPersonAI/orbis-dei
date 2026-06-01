@@ -1,5 +1,5 @@
-// Port of src-tauri/src/core/instance.rs — instance bootstrap + DB row mapping.
-// Field names are snake_case to match the JSON the frontend already expects.
+// Instance bootstrap + DB row mapping. Field names are snake_case to match the
+// JSON the frontend expects.
 import * as fs from "node:fs";
 import * as path from "node:path";
 import { randomUUID } from "node:crypto";

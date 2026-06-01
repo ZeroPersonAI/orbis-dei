@@ -1,6 +1,6 @@
-// Port of src-tauri/src/core/cycle/mod.rs — the 6-phase metabolic loop.
-// `app.emit` → state.events.emit; keychain → state.secrets; the Governor lives
-// in AppState (shared across loops so breaker/buckets/queue persist).
+// The 6-phase metabolic loop. Events go through state.events.emit; secrets
+// through state.secrets; the Governor lives in AppState (shared across loops so
+// breaker/buckets/queue persist).
 import * as fs from "node:fs";
 import * as path from "node:path";
 import type { AppState } from "../../state.ts";

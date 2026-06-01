@@ -1,5 +1,4 @@
-// Port of src-tauri/src/inference/governor/mod.rs — the inference governor:
-// rate-limits + budget + circuit breaker + fair queueing.
+// The inference governor: rate-limits + budget + circuit breaker + fair queueing.
 //
 // Every provider call (Anthropic / OpenAI / Gemini) goes through
 // `Governor.governedChat`, which records it in `inference_calls` under its
