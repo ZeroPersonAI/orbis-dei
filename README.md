@@ -86,3 +86,7 @@ all configured at runtime through the Settings UI.
   loops.
 - The HTTP/WS API is unauthenticated and meant to bind to localhost. See
   [SECURITY.md](SECURITY.md) before exposing it to a network.
+
+---
+
+Powered by [ZeroPerson LLC](https://zeroperson.ai) — zeroperson.ai
