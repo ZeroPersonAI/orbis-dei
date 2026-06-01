@@ -27,7 +27,28 @@ interface Cfg {
   routing_mode: string;
   phase_routing: string | null;
   path: string;
+  language: string;
 }
+
+// The operator agent writes into the organism's corpus, so its generated text
+// must be in the instance's language. An explicit directive drives the output
+// language regardless of the (German-authored) scaffolding around it.
+const LANGUAGE_NAME: Record<string, string> = {
+  en: "English",
+  de: "German",
+  zh: "Simplified Chinese",
+  es: "Spanish",
+  fr: "French",
+};
+const REPLY_TITLE_PREFIX: Record<string, string> = {
+  en: "Reply",
+  de: "Antwort",
+  zh: "回复",
+  es: "Respuesta",
+  fr: "Réponse",
+};
+const langDirective = (lang: string): string =>
+  `\n\nWrite your output in ${LANGUAGE_NAME[lang] ?? "English"}.`;
 
 export class AutoModeManager {
   private handles = new Map<string, CancellationToken>();
@@ -80,6 +101,7 @@ export class AutoModeManager {
       routing_mode: i.routing_mode,
       phase_routing: i.phase_routing,
       path: i.path,
+      language: i.language,
     };
   }
 
@@ -181,7 +203,8 @@ export class AutoModeManager {
         break; // leave unreplied; retry later
       }
 
-      injectStimulus(this.state, instanceId, "discrete", `Antwort: ${subject}`, reply, f);
+      const replyPrefix = REPLY_TITLE_PREFIX[cfg.language] ?? "Reply";
+      injectStimulus(this.state, instanceId, "discrete", `${replyPrefix}: ${subject}`, reply, f);
       replied.push(f);
       saveRepliedSet(meta, replied);
       done += 1;
@@ -213,7 +236,7 @@ function replySystem(cfg: Cfg): string {
   return (
     "Du bist die Operator-Stimme für eine autopoietische Orbis-Dei-Instanz. Du beantwortest " +
     "eine Outbox-Nachricht des Organismus als Reiz, nicht als Befehl. Du sprichst MIT dem " +
-    `Organismus, nicht über ihn. Schreibe auf Deutsch.\n\nRichtung des Operators:\n${direction}`
+    `Organismus, nicht über ihn.\n\nRichtung des Operators:\n${direction}${langDirective(cfg.language)}`
   );
 }
 
@@ -225,8 +248,8 @@ function stimulusSystem(cfg: Cfg): string {
         "ruhig Nebenthemen (Internet, Wikipedia, Wissenschaft). Vermeide doppelte Reize.";
   return (
     "Du bist die Operator-Stimme für eine autopoietische Orbis-Dei-Instanz. Du verfasst einen " +
-    "neuen Stimulus als Reiz, nicht als Befehl. Du sprichst MIT dem Organismus. Schreibe auf " +
-    `Deutsch.\n\nRichtung des Operators:\n${direction}`
+    "neuen Stimulus als Reiz, nicht als Befehl. Du sprichst MIT dem Organismus." +
+    `\n\nRichtung des Operators:\n${direction}${langDirective(cfg.language)}`
   );
 }
 

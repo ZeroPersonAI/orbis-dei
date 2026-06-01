@@ -7,10 +7,29 @@ import type { AppState } from "../state.ts";
 import { InstancePaths, writeAtomic } from "../persistence/fs.ts";
 import * as instance from "./instance.ts";
 import { invalidInput, notFound } from "../error.ts";
+import { normalizeLang, type Lang } from "../templates.ts";
 
 const KNOWLEDGE_MAX_BYTES = 100 * 1024;
 const REPLY_TO_PREFIX = "Reply-To: stimuli/outbox/";
 const READ_OUTBOX_KEY = "read_outbox";
+
+// App-generated wrapper text follows the instance's organism language so an
+// injected stimulus reads consistently in the corpus it lands in. (The
+// operator's own typed title/body is left exactly as entered.)
+const INJECTED_BY: Record<Lang, string> = {
+  en: "injected by operator at",
+  de: "vom Operator eingespeist am",
+  zh: "由操作者注入于",
+  es: "inyectado por el operador el",
+  fr: "injecté par l'opérateur le",
+};
+const REPLY_HEADING: Record<Lang, string> = {
+  en: "Reply",
+  de: "Antwort",
+  zh: "回复",
+  es: "Respuesta",
+  fr: "Réponse",
+};
 
 export type StimulusKind = "discrete" | "standing" | "knowledge";
 
@@ -58,7 +77,9 @@ export function injectStimulus(
   const t = title.trim();
   if (t.length === 0) throw invalidInput("stimulus title must not be empty");
 
-  const paths = pathsFor(state, id);
+  const inst = instance.get(state.db, id);
+  const paths = new InstancePaths(inst.path);
+  const lang = normalizeLang(inst.language);
 
   let replyTarget: string | null = null;
   if (replyTo) {
@@ -97,9 +118,9 @@ export function injectStimulus(
   }
 
   const bodySection = replyTarget
-    ? `Reply-To: stimuli/outbox/${replyTarget}\n\n## Antwort\n\n${body.trim()}\n`
+    ? `Reply-To: stimuli/outbox/${replyTarget}\n\n## ${REPLY_HEADING[lang]}\n\n${body.trim()}\n`
     : `${body.trim()}\n`;
-  const content = `# ${t}\n\n_injected by operator at ${now.toISOString()}_\n\n${bodySection}`;
+  const content = `# ${t}\n\n_${INJECTED_BY[lang]} ${now.toISOString()}_\n\n${bodySection}`;
 
   if (kind === "knowledge" && Buffer.byteLength(content) > KNOWLEDGE_MAX_BYTES) {
     throw invalidInput("knowledge stimulus exceeds the 100 KB SC-003 budget");

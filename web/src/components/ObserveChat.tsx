@@ -12,7 +12,7 @@ interface UiTurn extends ChatMessage {
 }
 
 export function ObserveChat({ instanceId }: Props) {
-  const { t } = useT();
+  const { t, locale } = useT();
   const [turns, setTurns] = useState<UiTurn[]>([]);
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
@@ -42,7 +42,7 @@ export function ObserveChat({ instanceId }: Props) {
     setInput("");
     setSending(true);
     try {
-      const res = await api.chatAboutInstance(instanceId, history, text);
+      const res = await api.chatAboutInstance(instanceId, history, text, locale);
       setTurns((prev) => [
         ...prev,
         {

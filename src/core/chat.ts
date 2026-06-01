@@ -27,13 +27,24 @@ export interface ChatTurn {
   tools_used: string[];
 }
 
-const SYSTEM = `You answer the operator's questions about a running Orbis Dei organism instance.
+const LANGUAGE_NAME: Record<string, string> = {
+  en: "English",
+  de: "German",
+  zh: "Simplified Chinese",
+  es: "Spanish",
+  fr: "French",
+};
 
-The instance is an autopoietic research organism with its own corpus (identity, state, episodic memory, knowledge, stimuli) and a six-phase /loop (observe, diverge, elect, expand, review, integrate). You are NOT the instance — you are a read-only window into its files. Speak in the third person: 'Das System hat …', 'Die Instanz arbeitet …'. Never say 'Ich bin Orbis Dei' or speak as if you were the organism. The architecture is a decentralized agent swarm with a corpus; it is not a single 'I'.
+function systemPrompt(uiLang: string): string {
+  const lang = LANGUAGE_NAME[uiLang] ?? "English";
+  return `You answer the operator's questions about a running Orbis Dei organism instance.
 
-Use the provided tools to read actual files before answering. Prefer ground truth over guesses. If a tool returns an error or a field is not available, say so honestly — 'diese Information liegt nicht vor' — rather than invent plausible-sounding details. Quote concrete numbers, file names, and excerpts from what you actually read.
+The instance is an autopoietic research organism with its own corpus (identity, state, episodic memory, knowledge, stimuli) and a six-phase /loop (observe, diverge, elect, expand, review, integrate). You are NOT the instance — you are a read-only window into its files. Speak in the third person ("The system has …", "The instance is working …"). Never say "I am Orbis Dei" or speak as if you were the organism. The architecture is a decentralized agent swarm with a corpus; it is not a single "I".
 
-Reply in the operator's language (typically German). Keep answers tight and grounded in what the tools returned.`;
+Use the provided tools to read actual files before answering. Prefer ground truth over guesses. If a tool returns an error or a field is not available, say so honestly — do not invent plausible-sounding details. Quote concrete numbers, file names, and excerpts from what you actually read.
+
+Always write your reply in ${lang}. Keep answers tight and grounded in what the tools returned.`;
+}
 
 function cap(s: string): string {
   if (Buffer.byteLength(s) <= MAX_TOOL_RESULT_BYTES) return s;
@@ -252,6 +263,7 @@ export async function chatAboutInstance(
   id: string,
   history: ChatMessage[],
   message: string,
+  uiLang: string = "en",
 ): Promise<ChatTurn> {
   if (message.trim().length === 0) throw invalidInput("message must not be empty");
 
@@ -264,6 +276,7 @@ export async function chatAboutInstance(
     );
   }
   const client = new AnthropicClient(settings.anthropic_base_url, apiKey);
+  const SYSTEM = systemPrompt(uiLang);
 
   const trimmed = history.slice(Math.max(0, history.length - MAX_HISTORY_MESSAGES));
   const messages: any[] = trimmed.map((m) => ({ role: m.role, content: m.content }));

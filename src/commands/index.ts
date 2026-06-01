@@ -338,7 +338,7 @@ export function buildCommands(state: AppState): Record<string, CommandHandler> {
 
     // ---- chat ----
     chat_about_instance: (a) =>
-      chatAboutInstance(state, a.id, (a.history ?? []) as ChatMessage[], a.message),
+      chatAboutInstance(state, a.id, (a.history ?? []) as ChatMessage[], a.message, a.language ?? "en"),
 
     // ---- tools inventory ----
     list_tools: (a) => {

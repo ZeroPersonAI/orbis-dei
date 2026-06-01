@@ -35,6 +35,13 @@ yet tag releases.
   daemon or auto-mode error logs a stack trace instead of silently exiting.
 
 ### Fixed
+- Language consistency for generated text. App-generated content now follows a
+  single language instead of mixing:
+  - Injected-stimulus wrapper text ("injected by operator at …", the reply
+    heading) follows the instance's organism language.
+  - The Observe chat replies in the operator's current UI language.
+  - The Auto-mode operator agent generates replies/stimuli in the instance's
+    organism language (it no longer hard-codes German).
 - Pause now emits `daemon:stopped` immediately (instead of only when the
   in-flight cycle reaches a cancellation checkpoint), so the instance view's
   Pause button reacts instantly.

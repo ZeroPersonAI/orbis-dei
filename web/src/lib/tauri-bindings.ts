@@ -328,11 +328,13 @@ export const api = {
     id: string,
     history: ChatMessage[],
     message: string,
+    language?: string,
   ) =>
     invoke<{ reply: string; tools_used: string[] }>("chat_about_instance", {
       id,
       history,
       message,
+      language: language ?? "en",
     }),
 
   // Tools inventory + Network log (Phase 13)
