@@ -1,4 +1,4 @@
-// Spanish UI translations. Keys are the English source strings.
+// es UI translations. Keys are the English source strings.
 const es: Record<string, string> = {
   "(could not read: {error})": "(no se pudo leer: {error})",
   "(empty)": "(vacío)",
@@ -270,6 +270,8 @@ const es: Record<string, string> = {
   "{n} queued": "{n} en cola",
   "…[truncated]": "…[truncado]",
   "○ mark read": "○ marcar leído",
-  "● mark unread": "● marcar no leído"
+  "● mark unread": "● marcar no leído",
+  "Organism language": "Idioma del organismo",
+  "The language the organism is born in — its constitution, state, and loop prompts. Independent of the interface language.": "El idioma en que nace el organismo: su constitución, estado y prompts del bucle. Independiente del idioma de la interfaz."
 };
 export default es;

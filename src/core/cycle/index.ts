@@ -12,6 +12,7 @@ import { loadSettings } from "../../persistence/settings.ts";
 import { Router, type RouterConfig, type PromptParts } from "../../inference/router.ts";
 import { type Phase, PHASES, type ChatResponse } from "../../inference/index.ts";
 import { buildPrompt, inboxIsEmpty } from "../../inference/prompt.ts";
+import { normalizeLang, type Lang } from "../../templates.ts";
 import { AppError } from "../../error.ts";
 import type { CancellationToken } from "../../util/cancel.ts";
 import { parseNetworkAccess, type NetworkAccess } from "./sandbox.ts";
@@ -167,6 +168,7 @@ async function runPhases(
         allowToolExecution,
         networkPolicy,
         networkAllowlist,
+        normalizeLang(instance.language),
       );
       tokensIn = outcome.input_tokens;
       tokensOut = outcome.output_tokens;
@@ -218,8 +220,9 @@ async function runSinglePhase(
   allowToolExecution: boolean,
   networkPolicy: NetworkAccess,
   networkAllowlist: string[],
+  lang: Lang,
 ): Promise<PhaseOutcome> {
-  const parts: PromptParts = buildPrompt(paths, phase, loopN);
+  const parts: PromptParts = buildPrompt(paths, phase, loopN, lang);
   const response: ChatResponse = await router.call(phase, parts, instanceId, state.governor, state.db);
 
   const rawBody = phaseBody(response);

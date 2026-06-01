@@ -1,4 +1,4 @@
-// German UI translations. Keys are the English source strings.
+// de UI translations. Keys are the English source strings.
 const de: Record<string, string> = {
   "(could not read: {error})": "(konnte nicht gelesen werden: {error})",
   "(empty)": "(leer)",
@@ -270,6 +270,8 @@ const de: Record<string, string> = {
   "{n} queued": "{n} in der Warteschlange",
   "…[truncated]": "…[gekürzt]",
   "○ mark read": "○ als gelesen markieren",
-  "● mark unread": "● als ungelesen markieren"
+  "● mark unread": "● als ungelesen markieren",
+  "Organism language": "Sprache des Organismus",
+  "The language the organism is born in — its constitution, state, and loop prompts. Independent of the interface language.": "Die Sprache, in der der Organismus geboren wird — Konstitution, State und Loop-Prompts. Unabhängig von der Oberflächensprache."
 };
 export default de;

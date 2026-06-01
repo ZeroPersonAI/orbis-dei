@@ -38,6 +38,8 @@ export interface Instance {
   /** JSON map {"<phase>":"<provider>"} when routing_mode === "custom". */
   phase_routing: string | null;
   loops_since_last_stimulus: number;
+  /** Organism language, chosen at creation: "en"|"de"|"zh"|"es"|"fr". */
+  language?: string;
 }
 
 export interface PhaseOutcome {
@@ -205,11 +207,13 @@ export const api = {
     name: string,
     routingMode?: RoutingMode,
     phaseRouting?: string,
+    language?: string,
   ) =>
     invoke<Instance>("create_instance", {
       name,
       routingMode,
       phaseRouting: phaseRouting ?? null,
+      language: language ?? "en",
     }),
   setInstanceRouting: (
     id: string,

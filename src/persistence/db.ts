@@ -31,7 +31,8 @@ export function migrate(db: DB): void {
         auto_stimulus_enabled           INTEGER NOT NULL DEFAULT 0,
         auto_stimulus_interval_minutes  INTEGER NOT NULL DEFAULT 15,
         auto_stimulus_prompt            TEXT,
-        phase_routing                   TEXT
+        phase_routing                   TEXT,
+        language                        TEXT NOT NULL DEFAULT 'de'
     );
 
     CREATE TABLE IF NOT EXISTS loop_events (
@@ -78,4 +79,13 @@ export function migrate(db: DB): void {
         updated_at TEXT NOT NULL
     );
   `);
+
+  // Additive migrations for databases created before a column existed. Existing
+  // instances were born in German, so the default matches their corpus.
+  const cols = (db.prepare("PRAGMA table_info(instances)").all() as { name: string }[]).map(
+    (c) => c.name,
+  );
+  if (!cols.includes("language")) {
+    db.exec("ALTER TABLE instances ADD COLUMN language TEXT NOT NULL DEFAULT 'de'");
+  }
 }

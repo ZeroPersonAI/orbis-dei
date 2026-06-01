@@ -89,7 +89,12 @@ export function buildCommands(state: AppState): Record<string, CommandHandler> {
   return {
     // ---- instance ----
     create_instance: (a) => {
-      const inst = instance.bootstrap(a.name, a.routingMode ?? "", state.instancesDir);
+      const inst = instance.bootstrap(
+        a.name,
+        a.routingMode ?? "",
+        a.language ?? "en",
+        state.instancesDir,
+      );
       if (a.phaseRouting && String(a.phaseRouting).trim().length > 0) {
         inst.phase_routing = a.phaseRouting;
       }

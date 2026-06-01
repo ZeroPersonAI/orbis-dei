@@ -1,4 +1,4 @@
-// Simplified Chinese UI translations. Keys are the English source strings.
+// zh UI translations. Keys are the English source strings.
 const zh: Record<string, string> = {
   "(could not read: {error})": "(无法读取：{error})",
   "(empty)": "(空)",
@@ -270,6 +270,8 @@ const zh: Record<string, string> = {
   "{n} queued": "{n} 个排队中",
   "…[truncated]": "…[已截断]",
   "○ mark read": "○ 标记已读",
-  "● mark unread": "● 标记未读"
+  "● mark unread": "● 标记未读",
+  "Organism language": "有机体语言",
+  "The language the organism is born in — its constitution, state, and loop prompts. Independent of the interface language.": "有机体诞生时使用的语言——其宪章、状态和循环提示。与界面语言无关。"
 };
 export default zh;

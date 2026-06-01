@@ -5,7 +5,7 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
 import { InstancePaths } from "../persistence/fs.ts";
-import { phaseTemplate } from "../templates.ts";
+import { phaseTemplate, type Lang } from "../templates.ts";
 import type { Phase } from "./index.ts";
 import type { PromptParts } from "./router.ts";
 
@@ -226,9 +226,14 @@ function phaseUserSuffix(phase: Phase, loopN: number): string {
   return base + phaseSpecific;
 }
 
-export function buildPrompt(paths: InstancePaths, phase: Phase, loopN: number): PromptParts {
+export function buildPrompt(
+  paths: InstancePaths,
+  phase: Phase,
+  loopN: number,
+  lang: Lang,
+): PromptParts {
   return {
-    system: phaseTemplate(phase),
+    system: phaseTemplate(phase, lang),
     stableUser: buildStableUser(paths),
     dynamicUser: buildDynamicUser(paths, phase, loopN),
   };

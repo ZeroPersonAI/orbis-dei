@@ -49,10 +49,11 @@ export function HabitatView({ onOpenSettings, onOpenInstance }: Props) {
   async function handleCreate(
     name: string,
     routingMode: RoutingMode,
-    phaseRouting?: string,
+    phaseRouting: string | undefined,
+    language: string,
   ) {
     try {
-      await api.createInstance(name, routingMode, phaseRouting);
+      await api.createInstance(name, routingMode, phaseRouting, language);
       setShowNew(false);
       await refresh();
     } catch (e) {

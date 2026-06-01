@@ -28,12 +28,19 @@ export interface Instance {
   auto_stimulus_enabled: boolean;
   auto_stimulus_interval_minutes: number;
   auto_stimulus_prompt: string | null;
+  /** Organism language ("en"|"de"|"zh"|"es"|"fr"), chosen at creation. */
+  language: string;
 }
 
 export const DEFAULT_ROUTING_MODE = "anthropic";
 
 /** Create a new instance on disk (layout, templates, git genesis commit). */
-export function bootstrap(name: string, routingMode: string, instancesDir: string): Instance {
+export function bootstrap(
+  name: string,
+  routingMode: string,
+  language: string,
+  instancesDir: string,
+): Instance {
   const trimmed = name.trim();
   if (trimmed.length === 0) throw invalidInput("instance name must not be empty");
   if (trimmed.length > 120) throw invalidInput("instance name too long (max 120)");
@@ -41,6 +48,8 @@ export function bootstrap(name: string, routingMode: string, instancesDir: strin
   let routing = routingMode.trim();
   if (routing.length === 0) routing = DEFAULT_ROUTING_MODE;
   validateRoutingMode(routing);
+
+  const lang = templates.normalizeLang(language);
 
   const id = randomUUID();
   const createdAt = new Date().toISOString();
@@ -50,15 +59,15 @@ export function bootstrap(name: string, routingMode: string, instancesDir: strin
 
   pgit.initRepo(instancePath);
 
-  writeAtomic(paths.claudeMd(), templates.CLAUDE_MD);
-  writeAtomic(paths.identity(), templates.IDENTITY_MD);
-  writeAtomic(paths.state(), templates.renderStateMd(createdAt));
-  writeAtomic(paths.superinstanceCurrent(), templates.SUPERINSTANCE_MD);
+  writeAtomic(paths.claudeMd(), templates.claudeMd(lang));
+  writeAtomic(paths.identity(), templates.identityMd(lang));
+  writeAtomic(paths.state(), templates.renderStateMd(createdAt, lang));
+  writeAtomic(paths.superinstanceCurrent(), templates.superinstanceMd(lang));
 
-  for (const [filename, content] of templates.standingConcerns()) {
+  for (const [filename, content] of templates.standingConcerns(lang)) {
     writeAtomic(path.join(paths.stimuliStanding(), filename), content);
   }
-  for (const [filename, content] of templates.loopPhases()) {
+  for (const [filename, content] of templates.loopPhases(lang)) {
     writeAtomic(path.join(paths.loopDir(), filename), content);
   }
 
@@ -66,8 +75,9 @@ export function bootstrap(name: string, routingMode: string, instancesDir: strin
     id,
     name: trimmed,
     created_at: createdAt,
-    schema_version: 2,
+    schema_version: 3,
     routing_mode: routing,
+    language: lang,
   };
   writeAtomic(paths.orbisMeta(), JSON.stringify(meta, null, 2));
 
@@ -91,14 +101,15 @@ export function bootstrap(name: string, routingMode: string, instancesDir: strin
     auto_stimulus_enabled: false,
     auto_stimulus_interval_minutes: 15,
     auto_stimulus_prompt: null,
+    language: lang,
   };
 }
 
 export function insert(db: DB, inst: Instance): void {
   db.prepare(
     `INSERT INTO instances
-       (id, name, path, created_at, status, loop_counter, routing_mode, phase_routing)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+       (id, name, path, created_at, status, loop_counter, routing_mode, phase_routing, language)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
   ).run(
     inst.id,
     inst.name,
@@ -108,6 +119,7 @@ export function insert(db: DB, inst: Instance): void {
     inst.loop_counter,
     inst.routing_mode,
     inst.phase_routing,
+    inst.language,
   );
 }
 
@@ -115,7 +127,7 @@ const COLS = `id, name, path, created_at, status, current_phase,
   loop_counter, last_stimulus_at, routing_mode, phase_routing,
   loops_since_last_stimulus, auto_mode_enabled, auto_reply_enabled,
   auto_reply_prompt, auto_stimulus_enabled,
-  auto_stimulus_interval_minutes, auto_stimulus_prompt`;
+  auto_stimulus_interval_minutes, auto_stimulus_prompt, language`;
 
 function rowToInstance(r: any): Instance {
   return {
@@ -136,6 +148,7 @@ function rowToInstance(r: any): Instance {
     auto_stimulus_enabled: !!r.auto_stimulus_enabled,
     auto_stimulus_interval_minutes: r.auto_stimulus_interval_minutes,
     auto_stimulus_prompt: r.auto_stimulus_prompt ?? null,
+    language: r.language ?? "de",
   };
 }
 

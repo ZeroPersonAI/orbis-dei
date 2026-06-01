@@ -7,6 +7,13 @@ yet tag releases.
 ## [Unreleased]
 
 ### Added
+- Per-instance organism language. A new instance is born in a chosen language
+  (English, Deutsch, 中文, Español, Français) — its constitution, state, standing
+  concerns, and loop system-prompts come from `assets/templates/<lang>/`. The
+  "New Instance" dialog has a language picker; the language is stored on the
+  instance (`language` column, additive migration; existing instances default to
+  German, matching their corpus). The machine-parsed `state.md` fields are kept
+  language-neutral so parsers and existing instances are unaffected.
 - Multilingual UI (English, Deutsch, 中文, Español, Français). Lightweight
   gettext-style i18n (`web/src/lib/i18n.tsx`): the English source string is the
   key, missing translations fall back to English. Default English; a language
