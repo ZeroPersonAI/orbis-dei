@@ -7,8 +7,8 @@ Every loop reads in Observe:
 
 Processed stimuli migrate, in Integrate, from `stimuli/inbox/` to `stimuli/processed/{YYYY-MM}/`. They are never deleted.
 
-## Lesson from Run 1
-Stimulus processing was unstructured. Stimuli disappeared without a trace or were reactivated multiple times.
+## Rationale
+Unstructured stimulus processing leads to stimuli disappearing without a trace or being reactivated multiple times.
 
 ## Check in Review
 If an inbox entry disappears between two loops without surfacing in `processed/` → failure (data loss, SP-I.4 violation).

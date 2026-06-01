@@ -2,8 +2,8 @@
 
 Keine einzelne Datei in `corpus/knowledge/` darf 100 KB überschreiten. Append-only-Logs gehören in `corpus/episodic/`, nicht in Knowledge. Knowledge ist strukturiertes Wissen, kein Zeitstrahl.
 
-## Lehre aus Lauf 1
-Knowledge-Files wuchsen unbeschränkt durch Auto-Append, wurden zu Logs verschiedener Domains, verloren ihre Such- und Reasoning-Tauglichkeit.
+## Begründung
+Unbeschränkt wachsende Knowledge-Files verkommen durch Auto-Append zu Logs verschiedener Domains und verlieren ihre Such- und Reasoning-Tauglichkeit.
 
 ## Wahrnehmung in Observe
 Knowledge-Files prüfen, ob Pufferung sich anbahnt. Bei Annäherung an Limit: in Diverge eine Aufspaltung als Kandidat.

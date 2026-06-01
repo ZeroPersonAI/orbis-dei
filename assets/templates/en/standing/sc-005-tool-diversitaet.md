@@ -2,8 +2,8 @@
 
 At least one new tool in `tools/native/` per 200 loops, or an explicit documented abstention in a Diverge phase.
 
-## Lesson from Run 1
-Capability growth stagnated after the first 500 loops. The system "perfected" the same phase cycle without building new tools — a symptom of ritualization.
+## Rationale
+Stagnating capability growth is a symptom of ritualization: the system "perfects" the same phase cycle without building new tools.
 
 ## Perception in Observe
 Count the loops since the last tool entry. As 200 is approached: take it into account in Diverge.

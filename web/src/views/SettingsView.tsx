@@ -125,7 +125,7 @@ export function SettingsView({ onBack }: Props) {
       await api.setOpenaiKey(newOpenaiKey.trim());
       setNewOpenaiKey("");
       setHasOpenai(true);
-      setNotice(t("OpenAI key saved to macOS Keychain."));
+      setNotice(t("OpenAI key saved."));
     } catch (e) {
       setError(String(e));
     }
@@ -147,7 +147,7 @@ export function SettingsView({ onBack }: Props) {
       await api.setGeminiKey(newGeminiKey.trim());
       setNewGeminiKey("");
       setHasGemini(true);
-      setNotice(t("Gemini key saved to macOS Keychain."));
+      setNotice(t("Gemini key saved."));
     } catch (e) {
       setError(String(e));
     }
@@ -172,7 +172,7 @@ export function SettingsView({ onBack }: Props) {
       await api.setAnthropicKey(newKey.trim());
       setNewKey("");
       setHasKey(true);
-      setNotice(t("Anthropic key saved to macOS Keychain."));
+      setNotice(t("Anthropic key saved."));
     } catch (e) {
       setError(String(e));
     } finally {
@@ -188,7 +188,7 @@ export function SettingsView({ onBack }: Props) {
     try {
       await api.clearAnthropicKey();
       setHasKey(false);
-      setNotice(t("Anthropic key removed from Keychain."));
+      setNotice(t("Anthropic key cleared."));
     } catch (e) {
       setError(String(e));
     } finally {
@@ -208,7 +208,7 @@ export function SettingsView({ onBack }: Props) {
         <div>
           <h1 className="text-xl font-light tracking-tight">{t("Settings")}</h1>
           <p className="text-xs text-neutral-500 mt-0.5">
-            {t("App-wide configuration. Secrets live in the macOS Keychain.")}
+            {t("App-wide configuration. Secrets are kept in an encrypted file in the data directory.")}
           </p>
         </div>
       </header>
@@ -240,8 +240,7 @@ export function SettingsView({ onBack }: Props) {
             {t("Anthropic API key")}
           </h2>
           <p className="text-xs text-neutral-500 mb-3">
-            {t("Required when any phase routes to Anthropic. Stored in macOS Keychain under")}{" "}
-            <code>com.orbisdei.habitat</code>.
+            {t("Required when any phase routes to Anthropic. Stored in an encrypted file in the data directory.")}
           </p>
 
           <div className="text-xs mb-3">
@@ -682,7 +681,7 @@ export function SettingsView({ onBack }: Props) {
                   )}
                 </div>
                 <p className="text-[10px] text-neutral-500 mt-1">
-                  {t("Token comes from @BotFather, stored in the macOS Keychain.")}
+                  {t("Token comes from @BotFather, stored in the encrypted secret store.")}
                 </p>
               </div>
 

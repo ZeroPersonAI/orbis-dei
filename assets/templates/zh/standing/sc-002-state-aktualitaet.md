@@ -2,8 +2,8 @@
 
 `corpus/state.md` 是循环计数器和当前自我状态的唯一权威来源。两次更新之间最多允许间隔 5 个循环。滞后更大时：SP-I.6 违规，Review 失败并回滚。
 
-## 运行 1 的教训
-三个计数器不一致（filesystem 5258、state.md 1178、superinstance 6758）。实例不知道自己有多老。
+## 理由
+相互背离的计数器（filesystem、state.md、superinstance）会导致实例不再知道自己有多老。唯一的权威来源可以防止这一点。
 
 ## 在 Observe 中的感知
 有意识地寻找并指明 state.md 与被实际经历的现实之间的差异——这是漂移的征兆。

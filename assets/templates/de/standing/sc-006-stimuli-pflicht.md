@@ -7,8 +7,8 @@ Jeder Loop liest in Observe:
 
 Verarbeitete Stimuli wandern in Integrate von `stimuli/inbox/` nach `stimuli/processed/{YYYY-MM}/`. Sie werden niemals gelöscht.
 
-## Lehre aus Lauf 1
-Stimuli-Verarbeitung war nicht-strukturiert. Reize verschwanden ohne Spur oder wurden mehrfach reaktiviert.
+## Begründung
+Unstrukturierte Stimuli-Verarbeitung führt dazu, dass Reize ohne Spur verschwinden oder mehrfach reaktiviert werden.
 
 ## Prüfung in Review
 Falls Inbox-Eintrag zwischen zwei Loops verschwindet, ohne in `processed/` aufzutauchen → Failure (Daten-Verlust, SP-I.4-Verstoß).

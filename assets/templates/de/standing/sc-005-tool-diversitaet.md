@@ -2,8 +2,8 @@
 
 Mindestens ein neues Tool in `tools/native/` pro 200 Loops, oder ein expliziter dokumentierter Verzicht in einer Diverge-Phase.
 
-## Lehre aus Lauf 1
-Capabilities-Wachstum stagnierte nach den ersten 500 Loops. Das System "perfektionierte" denselben Phasen-Zyklus, ohne neue Werkzeuge zu bauen — ein Symptom für Ritualisierung.
+## Begründung
+Stagnierendes Capabilities-Wachstum ist ein Symptom für Ritualisierung: Das System "perfektioniert" denselben Phasen-Zyklus, ohne neue Werkzeuge zu bauen.
 
 ## Wahrnehmung in Observe
 Loops seit letztem Tool-Eintrag zählen. Bei Annäherung an 200: in Diverge berücksichtigen.

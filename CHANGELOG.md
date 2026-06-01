@@ -34,6 +34,16 @@ yet tag releases.
 - Global `unhandledRejection` / `uncaughtException` handlers so a background
   daemon or auto-mode error logs a stack trace instead of silently exiting.
 
+### Changed
+- Default organism templates are now generic and self-contained (all five
+  languages): removed run/incarnation history, personal names, and references to
+  predecessor archive files that a fresh instance never has; fixed an internal
+  run-2-vs-run-3 contradiction. A new instance now reads as a freshly born,
+  first-of-its-kind organism at Loop 1. (Machine-parsed `state.md` fields kept
+  verbatim; existing instances are untouched.)
+- Settings UI text corrected: secrets are stored in an encrypted file in the
+  data directory, not the macOS Keychain (updated source strings + de/zh/es/fr).
+
 ### Fixed
 - Language consistency for generated text. App-generated content now follows a
   single language instead of mixing:

@@ -2,8 +2,8 @@
 
 Al menos una herramienta nueva en `tools/native/` por cada 200 loops, o una renuncia explícita y documentada en una fase Diverge.
 
-## Lección del Run 1
-El crecimiento de capacidades se estancó tras los primeros 500 loops. El sistema "perfeccionaba" el mismo ciclo de fases sin construir nuevas herramientas — un síntoma de ritualización.
+## Justificación
+El estancamiento del crecimiento de capacidades es un síntoma de ritualización: el sistema "perfecciona" el mismo ciclo de fases sin construir nuevas herramientas.
 
 ## Percepción en Observe
 Contar los loops desde la última entrada de herramienta. Al acercarse a 200: tener en cuenta en Diverge.

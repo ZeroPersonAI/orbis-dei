@@ -2,8 +2,8 @@
 
 `corpus/state.md` is the sole authoritative source for the loop counter and the current self-state. At most 5 loops may lie between two updates. On a greater lag: SP-I.6 violation, review failure with rollback.
 
-## Lesson from Run 1
-Three counters inconsistent (filesystem 5258, state.md 1178, superinstance 6758). The instance did not know how old it was.
+## Rationale
+Diverging counters (filesystem, state.md, superinstance) lead to the instance no longer knowing how old it is. A single authoritative source prevents this.
 
 ## Perception in Observe
 Deliberately seek out and name discrepancies between state.md and lived reality — an indication of drift.

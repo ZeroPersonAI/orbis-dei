@@ -2,8 +2,8 @@
 
 50 loops consecutivos sin un nuevo estímulo en `stimuli/inbox/` disparan una pausa. En Observe se escribe una anotación explícita: *"50+ loops sin estímulos externos. El sistema solicita estímulo. El loop se pausa hasta intervención del operador."* El daemon se detiene hasta que aparece una nueva entrada en `stimuli/inbox/`.
 
-## Lección del Run 1
-Sin acoplamiento al entorno el sistema colapsó en ritualización endógena. Un organismo sin mundo degenera.
+## Justificación
+Sin acoplamiento al entorno un sistema autopoiético colapsa en ritualización endógena. Un organismo sin mundo degenera.
 
 ## Percepción en Observe
 Registrar el contador `loops_since_last_stimulus` en cada loop. Al acercarse a 50: generar candidatos de reacción en Diverge (p. ej. una reflexión especialmente enfocada que pudiera suscitar un estímulo).

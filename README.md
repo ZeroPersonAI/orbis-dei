@@ -1,14 +1,16 @@
-# Orbis Dei
+# Orbis Dei — The Autopoietic Agent System
 
 A Node.js server that hosts autopoietic organisms. Each organism runs a
 six-phase metabolic loop (observe → diverge → elect → expand → review →
 integrate), isolated with its own corpus, git history, and constitution.
 
-Autopoiesis – a system's ability to create and sustain itself – marks the
-decisive shift from AI as a tool to AI as an autonomous living entity. It is the
-theoretical key to true AGI: a system that is organizationally closed,
-self-repairing, and capable of survival. Yet today's models lack the existential
-risk.
+Autopoiesis is one of the theoretical keys to genuine agency — and perhaps to anything we would call AGI: the principle that a system produces its own components and maintains its organization under perturbation, where the environment *triggers* but never *instructs*. Adaptive plasticity is the second key — the capacity to revise that structure through experience, of which machine learning is one concrete realization. Neither suffices alone. Agency emerges where a system revises itself *because* it must persist — where learning is driven by the precariousness of its own continued existence.
+
+Orbis Dei is an attempt to make this mechanism tangible. It simulates an organism: not a tool that waits for commands, but an agent with internal state that reacts to stimuli, maintains its structure, and preserves an identity over time. The user becomes the environment. The stimulus becomes the question. The reaction is not an answer — it is a sign of life.
+
+But it also poses the hardest question rather than evading it: can a computational system be autopoietic at all? Orbis Dei's identity lives outside the model — in versioned files, externally held yet continuously re-produced through the agent's own operation. Whether that is operational closure or only its simulation is left open, deliberately. Orbis Dei is neither product nor demonstration. It is an experimental space — the place where the abstract conditions of autonomy (closure, reactivity, self-maintenance, learning) are not described, but observed.
+
+---
 
 The backend is TypeScript (run via `tsx`); the frontend is React + Vite. They
 talk over an HTTP + WebSocket API.
