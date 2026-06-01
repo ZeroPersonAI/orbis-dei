@@ -224,7 +224,8 @@ export function SettingsView({ onBack }: Props) {
         </div>
       )}
 
-      <main className="flex-1 overflow-auto p-6 max-w-2xl">
+      <main className="flex-1 overflow-auto p-6">
+        <div className="max-w-2xl mx-auto">
         {/* Language */}
         <section className="mb-8">
           <h2 className="text-sm font-medium text-neutral-300 mb-1">
@@ -801,6 +802,7 @@ export function SettingsView({ onBack }: Props) {
             </div>
           </>
         )}
+        </div>
       </main>
     </div>
   );
