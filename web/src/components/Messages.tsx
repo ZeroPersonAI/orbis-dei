@@ -175,7 +175,7 @@ export function Messages({ instanceId, refreshTick, onReplied }: Props) {
                 <span
                   className={`text-[11px] font-mono truncate flex-1 ${titleClass}`}
                 >
-                  {extractTitle(thr.content) || thr.name}
+                  {threadTitle(thr.content, thr.name)}
                 </span>
                 {unreplied && (
                   <span
@@ -203,7 +203,7 @@ export function Messages({ instanceId, refreshTick, onReplied }: Props) {
           <>
             <div className="flex items-baseline gap-2 mb-3">
               <h2 className="text-sm text-neutral-200">
-                {extractTitle(thread.content) || thread.name}
+                {threadTitle(thread.content, thread.name)}
               </h2>
               <span className="text-[10px] text-neutral-500 font-mono">
                 {thread.name} · {fmtTime(thread.modified_at)}
@@ -326,6 +326,25 @@ function extractTitle(content: string): string {
     if (line.startsWith("# ")) return line.slice(2).trim();
   }
   return "";
+}
+
+/**
+ * Display title for an outbox thread. Uses the file's `# ` heading, but when
+ * that is missing or the placeholder "Untitled Message" the organism sometimes
+ * emits, falls back to the first real content line, then to the filename.
+ */
+function threadTitle(content: string, fallback: string): string {
+  const heading = extractTitle(content);
+  if (heading && heading.toLowerCase() !== "untitled message") return heading;
+  for (const raw of content.split("\n")) {
+    const line = raw.replace(/^>+\s*/, "").trim();
+    if (!line) continue;
+    if (line.startsWith("#") || line.startsWith("---")) continue;
+    if (line.startsWith("_") && line.endsWith("_")) continue; // italic meta (_deposited by …_)
+    if (line.startsWith("Reply-To:")) continue;
+    return line.length > 60 ? line.slice(0, 60).trimEnd() + "…" : line;
+  }
+  return fallback;
 }
 
 function fmtTime(rfc: string): string {
