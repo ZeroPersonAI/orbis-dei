@@ -18,6 +18,7 @@ const GEN_PHASE: Phase = "elect";
 const REPLIED_KEY = "auto_replied_outbox";
 
 interface Cfg {
+  status: string;
   auto_mode_enabled: boolean;
   auto_reply_enabled: boolean;
   auto_reply_prompt: string | null;
@@ -71,6 +72,7 @@ export class AutoModeManager {
   private loadCfg(id: string): Cfg {
     const i = instance.get(this.state.db, id);
     return {
+      status: i.status,
       auto_mode_enabled: i.auto_mode_enabled,
       auto_reply_enabled: i.auto_reply_enabled,
       auto_reply_prompt: i.auto_reply_prompt,
@@ -94,6 +96,16 @@ export class AutoModeManager {
         break;
       }
       if (!cfg.auto_mode_enabled) break;
+
+      // Auto-mode is the operator for a *living* loop. While the instance is
+      // not actively looping (paused, boredom, error, idle), stay armed but
+      // dormant — don't inject stimuli that would only pile up unprocessed and
+      // burn tokens. This resumes automatically once the daemon is running
+      // again, with no restart needed.
+      if (cfg.status !== "running") {
+        await cancel.sleep(POLL_TICK_SECS * 1000);
+        continue;
+      }
 
       if (cfg.auto_reply_enabled) {
         try {
