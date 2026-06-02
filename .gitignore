@@ -13,3 +13,8 @@ web/src/lib/locales/_keys.json
 # article kept locally for publishing, not in the repo
 docs/orbis-dei-the-autopoietic-agent.md
 docs/*.pdf
+
+# Internal code-review log (not part of the product)
+/REVIEW.md
+/.claude/scheduled_tasks.lock
+/.claude/scheduled_tasks.json

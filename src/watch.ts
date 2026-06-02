@@ -30,6 +30,12 @@ export class InstanceWatcher {
       }, DEBOUNCE_MS);
     };
     watcher.on("all", onChange);
+    // An unhandled 'error' event on the FSWatcher (an EventEmitter) would throw
+    // as an uncaught exception. Log it so a watch failure degrades to "no live
+    // corpus updates" instead of crashing the process.
+    watcher.on("error", (err: unknown) =>
+      console.warn(`corpus watcher error (instance ${instanceId}):`, err),
+    );
     return iw;
   }
 

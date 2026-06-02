@@ -46,8 +46,15 @@ export class Orchestrator {
     this.handles.set(instanceId, { cancel });
     this.state.events.emit("daemon:started", { instance_id: instanceId });
 
-    // Fire-and-forget the loop body.
-    void this.daemonBody(instanceId, cancel);
+    // Fire-and-forget the loop body. The `.catch` safety net ensures an
+    // unexpected throw outside daemonBody's own try/catch can't leave a zombie
+    // handle (UI stuck "running") or an unhandled rejection.
+    void this.daemonBody(instanceId, cancel).catch((e) => {
+      this.handles.delete(instanceId);
+      this.markStatus(instanceId, "error", inst.loop_counter);
+      this.state.events.emit("daemon:stopped", { instance_id: instanceId, reason: "error" });
+      console.error(`[daemon ${instanceId}] crashed:`, e);
+    });
   }
 
   async stop(instanceId: string): Promise<void> {

@@ -413,7 +413,14 @@ function archiveProcessedStimuli(paths: InstancePaths, nowRfc: string): void {
 
   const ym = nowRfc.slice(0, 7); // YYYY-MM
   const targetDir = path.join(paths.stimuliProcessed(), ym);
-  fs.mkdirSync(targetDir, { recursive: true });
+  try {
+    fs.mkdirSync(targetDir, { recursive: true });
+  } catch {
+    // Archiving is best-effort housekeeping. If the target dir can't be created
+    // (e.g. permissions), skip it rather than throwing — and rolling back — an
+    // otherwise-committed loop.
+    return;
+  }
 
   for (const name of entries) {
     const from = path.join(inbox, name);
@@ -421,9 +428,16 @@ function archiveProcessedStimuli(paths: InstancePaths, nowRfc: string): void {
     try {
       fs.renameSync(from, to);
     } catch {
-      const bytes = fs.readFileSync(from);
-      fs.writeFileSync(to, bytes);
-      fs.unlinkSync(from);
+      // Cross-device rename (EXDEV) → copy+unlink. If the source vanished
+      // between the readdir scan and here, there is nothing to archive — skip
+      // it rather than throwing ENOENT and failing the whole integrate.
+      try {
+        const bytes = fs.readFileSync(from);
+        fs.writeFileSync(to, bytes);
+        fs.unlinkSync(from);
+      } catch {
+        /* source already gone or unreadable — nothing to archive */
+      }
     }
   }
 }

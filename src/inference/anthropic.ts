@@ -239,7 +239,7 @@ export class AnthropicClient {
     if (content.trim().length === 0) {
       throw internal(
         `model returned an empty text response (stop_reason=${JSON.stringify(parsed.stop_reason)}, ` +
-          `blocks=${JSON.stringify(blockTypes)}, output_tokens=${parsed.usage.output_tokens}). ` +
+          `blocks=${JSON.stringify(blockTypes)}, output_tokens=${parsed.usage?.output_tokens ?? "?"}). ` +
           `The model likely exhausted max_tokens before emitting an answer — raise ` +
           `DEFAULT_MAX_TOKENS or use a less verbose model.`,
       );

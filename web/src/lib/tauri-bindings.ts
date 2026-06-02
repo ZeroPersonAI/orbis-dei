@@ -261,7 +261,7 @@ export const api = {
   daemonStatus: (id: string) => invoke<boolean>("daemon_status", { id }),
   listRunningDaemons: () => invoke<string[]>("list_running_daemons"),
 
-  // Auto-Modus (operator-agent)
+  // Auto-Mode (operator-agent)
   getAutoConfig: (id: string) => invoke<AutoConfig>("get_auto_config", { id }),
   setAutoConfig: (id: string, config: AutoConfig) =>
     invoke<AutoConfig>("set_auto_config", { id, config }),

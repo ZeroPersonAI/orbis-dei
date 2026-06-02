@@ -50,8 +50,14 @@ export class SecretStore {
       decipher.setAuthTag(tag);
       const dec = Buffer.concat([decipher.update(data), decipher.final()]);
       return JSON.parse(dec.toString("utf8"));
-    } catch {
-      // Unreadable (key rotated / corrupt) — treat as empty rather than crash.
+    } catch (e) {
+      // Unreadable (wrong ORBIS_SECRET / corrupt file). Treat as empty rather
+      // than crash, but warn — silently dropping every stored key would
+      // otherwise surface only as confusing "missing config" errors downstream.
+      console.warn(
+        `secrets: ${this.filePath} could not be decrypted (wrong key or corrupt), ` +
+          `treating as empty: ${e instanceof Error ? e.message : String(e)}`,
+      );
       return {};
     }
   }

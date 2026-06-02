@@ -70,13 +70,16 @@ async function runLoop(state: AppState): Promise<void> {
         continue;
       }
       updates = j.result ?? [];
-    } catch {
+    } catch (e) {
+      // Network/parse error. Retry after a pause, but log it — a persistent
+      // misconfiguration would otherwise make the bot freeze silently.
+      console.warn("telegram getUpdates failed, retrying:", e instanceof Error ? e.message : e);
       await sleep(2000);
       continue;
     }
 
     for (const u of updates) {
-      offset = u.update_id + 1;
+      if (typeof u?.update_id === "number") offset = u.update_id + 1; // guard against NaN offset
 
       if (u.callback_query) {
         await handleCallback(state, base, settings, defaultInstance, pending, u.callback_query);
@@ -92,7 +95,7 @@ async function runLoop(state: AppState): Promise<void> {
         await sendMessage(
           base,
           chatId,
-          "(Diese Chat-ID ist nicht authorisiert. Erst in den App-Settings eintragen.)",
+          "(This chat ID is not authorized. Add it first in the app settings.)",
           false,
         );
         continue;
@@ -165,7 +168,7 @@ async function handleCallback(
 
   const idx = pending.findIndex((e) => e.chatId === chatId && e.botMsgId === botMsgId);
   if (idx < 0) {
-    await answerCallback(base, cbId, "Button abgelaufen", true);
+    await answerCallback(base, cbId, "Button expired", true);
     await editRemoveKeyboard(base, chatId, botMsgId);
     return;
   }
@@ -175,10 +178,10 @@ async function handleCallback(
   await editRemoveKeyboard(base, chatId, botMsgId);
   try {
     const rel = injectStimulus(state, defaultInstance, "discrete", title, entry.originalText, null);
-    await answerCallback(base, cbId, "Eingespielt", false);
-    await sendMessage(base, chatId, `✓ Eingespielt → ${rel}`, false);
+    await answerCallback(base, cbId, "Injected", false);
+    await sendMessage(base, chatId, `✓ Injected → ${rel}`, false);
   } catch (e: any) {
-    await answerCallback(base, cbId, `Fehler: ${e?.message ?? e}`, true);
+    await answerCallback(base, cbId, `Error: ${e?.message ?? e}`, true);
   }
 }
 
@@ -204,7 +207,7 @@ async function sendMessage(
   const payload: any = { chat_id: chatId, text: truncated };
   if (withButton) {
     payload.reply_markup = {
-      inline_keyboard: [[{ text: "📨 Als Stimulus einspeisen", callback_data: CB_STIM_INJECT }]],
+      inline_keyboard: [[{ text: "📨 Inject as stimulus", callback_data: CB_STIM_INJECT }]],
     };
   }
   try {

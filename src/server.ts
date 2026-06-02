@@ -16,6 +16,12 @@ import { spawnTelegram } from "./telegram.ts";
 const here = path.dirname(fileURLToPath(import.meta.url));
 const WEB_DIST = path.resolve(here, "..", "web", "dist");
 const PORT = Number(process.env.PORT ?? 1421);
+// Bind to loopback by default: the command API has no authentication and holds
+// provider API keys / spends money, so it must not be reachable from the LAN.
+// Set ORBIS_HOST=0.0.0.0 to expose it deliberately (only behind your own
+// auth/proxy or in a trusted, isolated container).
+const HOST = process.env.ORBIS_HOST ?? "127.0.0.1";
+const BOUND_TO_LOOPBACK = HOST === "127.0.0.1" || HOST === "::1" || HOST === "localhost";
 
 // A background daemon / auto-mode task or a stray WebSocket error must never be
 // able to take the whole server down silently. Node aborts the process on an
@@ -34,6 +40,24 @@ async function main() {
 
   const app = express();
   app.use(express.json({ limit: "16mb" }));
+
+  // DNS-rebinding guard. When bound to loopback (the default), only serve
+  // requests whose Host header is itself loopback. Without this, a web page the
+  // user visits could rebind its own domain to 127.0.0.1 and drive this
+  // unauthenticated API from the victim's browser. Skipped when the operator
+  // has deliberately bound to a non-loopback host via ORBIS_HOST.
+  if (BOUND_TO_LOOPBACK) {
+    app.use((req, res, next) => {
+      const raw = req.headers.host ?? "";
+      const m = raw.match(/^(\[[^\]]+\]|[^:]+)(?::\d+)?$/);
+      const hostname = m ? m[1].replace(/^\[|\]$/g, "") : raw;
+      if (hostname === "localhost" || hostname === "127.0.0.1" || hostname === "::1") {
+        next();
+      } else {
+        res.status(403).json({ error: "forbidden host" });
+      }
+    });
+  }
 
   // --- command dispatch ---
   app.post("/api/command/:name", async (req, res) => {
@@ -80,12 +104,20 @@ async function main() {
   state.events.subscribe((e) => {
     const data = JSON.stringify(e);
     for (const client of wss.clients) {
-      if (client.readyState === client.OPEN) client.send(data);
+      if (client.readyState !== client.OPEN) continue;
+      try {
+        client.send(data);
+      } catch {
+        // Client went away between the readyState check and send. Skip it so
+        // one dead socket can't abort the broadcast to the others (and bubble
+        // out of the EventBus listener into the emitter).
+      }
     }
   });
 
-  server.listen(PORT, () => {
-    console.log(`Orbis Dei server listening on http://localhost:${PORT}`);
+  server.listen(PORT, HOST, () => {
+    const shown = BOUND_TO_LOOPBACK ? "localhost" : HOST;
+    console.log(`Orbis Dei server listening on http://${shown}:${PORT}`);
     console.log(`  data dir: ${dataDir}`);
     if (!fs.existsSync(WEB_DIST)) console.log("  frontend not built — run: npm run build:web");
   });

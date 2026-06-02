@@ -18,7 +18,7 @@ import { ToolsInventory } from "../components/ToolsInventory";
 import { NetworkLog } from "../components/NetworkLog";
 import { Dashboard } from "../components/Dashboard";
 import { Messages } from "../components/Messages";
-import { AutoModusTab } from "../components/AutoModusTab";
+import { AutoModeTab } from "../components/AutoModeTab";
 import { useT } from "../lib/i18n";
 
 interface Props {
@@ -36,7 +36,7 @@ type Tab =
   | "tools"
   | "network"
   | "superinstance"
-  | "auto_modus";
+  | "auto_mode";
 
 const STATUS_COLORS: Record<string, string> = {
   idle: "bg-neutral-600",
@@ -241,7 +241,7 @@ export function InstanceView({ instanceId, onBack }: Props) {
             ["tools", "Tools"],
             ["network", "Network"],
             ["superinstance", "Superinstance"],
-            ["auto_modus", "Auto Modus"],
+            ["auto_mode", "Auto Mode"],
           ] as Array<[Tab, string]>
         ).map(([key, label]) => (
           <button
@@ -295,7 +295,7 @@ export function InstanceView({ instanceId, onBack }: Props) {
             refreshTick={refreshTick}
           />
         )}
-        {tab === "auto_modus" && <AutoModusTab instanceId={instanceId} />}
+        {tab === "auto_mode" && <AutoModeTab instanceId={instanceId} />}
       </main>
     </div>
   );

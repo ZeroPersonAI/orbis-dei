@@ -6,7 +6,7 @@ interface Props {
   instanceId: string;
 }
 
-export function AutoModusTab({ instanceId }: Props) {
+export function AutoModeTab({ instanceId }: Props) {
   const { t } = useT();
   const DEFAULT_REPLY_PROMPT = t(
     "Honor genuine substance, gently correct misconceptions, guide the system " +
