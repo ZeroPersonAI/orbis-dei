@@ -28,7 +28,7 @@ export interface Instance {
   auto_stimulus_enabled: boolean;
   auto_stimulus_interval_minutes: number;
   auto_stimulus_prompt: string | null;
-  /** Organism language ("en"|"de"|"zh"|"es"|"fr"), chosen at creation. */
+  /** Organism language. Always "en". */
   language: string;
 }
 
@@ -148,7 +148,7 @@ function rowToInstance(r: any): Instance {
     auto_stimulus_enabled: !!r.auto_stimulus_enabled,
     auto_stimulus_interval_minutes: r.auto_stimulus_interval_minutes,
     auto_stimulus_prompt: r.auto_stimulus_prompt ?? null,
-    language: r.language ?? "de",
+    language: r.language ?? "en",
   };
 }
 

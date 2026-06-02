@@ -9,3 +9,7 @@ data/
 /CLAUDE.md
 /tasks/
 web/src/lib/locales/_keys.json
+
+# article kept locally for publishing, not in the repo
+docs/orbis-dei-the-autopoietic-agent.md
+docs/*.pdf

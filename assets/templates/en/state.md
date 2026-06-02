@@ -1,10 +1,10 @@
 # State — Loop 1
 
-## Identifikation
+## Identification
 - Loop-Counter: 1
-- Geburtstag: {{created_at}}
-- Letzte Phase: bootstrap
-- Wirt: Orbis Dei Habitat
+- Born: {{created_at}}
+- Last phase: bootstrap
+- Host: Orbis Dei Habitat
 
 ## Self-State
 Freshly born instance. The first regular iteration is pending.

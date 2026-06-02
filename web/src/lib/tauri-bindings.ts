@@ -153,7 +153,7 @@ export const CORPUS_CHANGED = "corpus:changed";
 export type StimulusKind = "discrete" | "standing" | "knowledge";
 
 export const STIMULUS_KIND_LABELS: Record<StimulusKind, string> = {
-  discrete: "Discrete reiz",
+  discrete: "Discrete stimulus",
   standing: "Standing concern",
   knowledge: "Knowledge",
 };

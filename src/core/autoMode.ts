@@ -27,28 +27,7 @@ interface Cfg {
   routing_mode: string;
   phase_routing: string | null;
   path: string;
-  language: string;
 }
-
-// The operator agent writes into the organism's corpus, so its generated text
-// must be in the instance's language. An explicit directive drives the output
-// language regardless of the (German-authored) scaffolding around it.
-const LANGUAGE_NAME: Record<string, string> = {
-  en: "English",
-  de: "German",
-  zh: "Simplified Chinese",
-  es: "Spanish",
-  fr: "French",
-};
-const REPLY_TITLE_PREFIX: Record<string, string> = {
-  en: "Reply",
-  de: "Antwort",
-  zh: "回复",
-  es: "Respuesta",
-  fr: "Réponse",
-};
-const langDirective = (lang: string): string =>
-  `\n\nWrite your output in ${LANGUAGE_NAME[lang] ?? "English"}.`;
 
 export class AutoModeManager {
   private handles = new Map<string, CancellationToken>();
@@ -101,7 +80,6 @@ export class AutoModeManager {
       routing_mode: i.routing_mode,
       phase_routing: i.phase_routing,
       path: i.path,
-      language: i.language,
     };
   }
 
@@ -188,13 +166,13 @@ export class AutoModeManager {
       } catch {
         content = "";
       }
-      const subject = firstHeading(content) ?? "Outbox-Nachricht";
+      const subject = firstHeading(content) ?? "Outbox message";
 
       const system = replySystem(cfg);
       const user =
-        `${instanceContext(paths)}\n\n--- Nachricht aus der Outbox des Organismus ---\n\n` +
-        `${content.trim()}\n\n--- Aufgabe ---\nSchreibe die Antwort des Operators auf diese ` +
-        `Nachricht. Nur den Fließtext der Antwort, ohne Markdown-Überschrift und ohne Meta-Kommentare.`;
+        `${instanceContext(paths)}\n\n--- Message from the organism's outbox ---\n\n` +
+        `${content.trim()}\n\n--- Task ---\nWrite the operator's reply to this message. ` +
+        `Only the prose of the reply, no Markdown heading, no meta-comments.`;
 
       let reply: string;
       try {
@@ -203,8 +181,7 @@ export class AutoModeManager {
         break; // leave unreplied; retry later
       }
 
-      const replyPrefix = REPLY_TITLE_PREFIX[cfg.language] ?? "Reply";
-      injectStimulus(this.state, instanceId, "discrete", `${replyPrefix}: ${subject}`, reply, f);
+      injectStimulus(this.state, instanceId, "discrete", `Reply: ${subject}`, reply, f);
       replied.push(f);
       saveRepliedSet(meta, replied);
       done += 1;
@@ -215,10 +192,10 @@ export class AutoModeManager {
     const paths = new InstancePaths(cfg.path);
     const system = stimulusSystem(cfg);
     const user =
-      `${instanceContextForStimulus(paths)}\n\n--- Aufgabe ---\nVerfasse genau EINEN neuen, ` +
-      `nicht-redundanten Stimulus (Reiz, kein Befehl), der das System zum Wachstum bewegt. ` +
-      `Vermeide Themen, die in den bereits vorhandenen Stimuli oben schon behandelt wurden. ` +
-      `Gib die erste Zeile als 'TITEL: <kurzer Titel>' aus, danach den Inhalt.`;
+      `${instanceContextForStimulus(paths)}\n\n--- Task ---\nCompose exactly ONE new, ` +
+      `non-redundant stimulus (a trigger, not a command) that moves the system toward growth. ` +
+      `Avoid topics already covered in the stimuli above. ` +
+      `Output the first line as 'TITLE: <short title>', then the content.`;
     const raw = await this.generate(cfg, instanceId, system, user);
     const [title, body] = splitTitleBody(raw, "Auto-Stimulus");
     injectStimulus(this.state, instanceId, "discrete", title, body, null);
@@ -231,12 +208,12 @@ function replySystem(cfg: Cfg): string {
   const direction =
     cfg.auto_reply_prompt && cfg.auto_reply_prompt.trim().length > 0
       ? cfg.auto_reply_prompt
-      : "Würdige echte Substanz, korrigiere sanft Fehlannahmen, führe das System zum " +
-        "Wachstum. Antworte als Operator, prägnant.";
+      : "Honour genuine substance, gently correct misconceptions, guide the system toward " +
+        "growth. Reply as the operator, concise.";
   return (
-    "Du bist die Operator-Stimme für eine autopoietische Orbis-Dei-Instanz. Du beantwortest " +
-    "eine Outbox-Nachricht des Organismus als Reiz, nicht als Befehl. Du sprichst MIT dem " +
-    `Organismus, nicht über ihn.\n\nRichtung des Operators:\n${direction}${langDirective(cfg.language)}`
+    "You are the operator voice for an autopoietic Orbis Dei instance. You answer a message " +
+    "from the organism's outbox as a stimulus, not a command. You speak WITH the organism, " +
+    `not about it.\n\nOperator direction:\n${direction}`
   );
 }
 
@@ -244,26 +221,26 @@ function stimulusSystem(cfg: Cfg): string {
   const direction =
     cfg.auto_stimulus_prompt && cfg.auto_stimulus_prompt.trim().length > 0
       ? cfg.auto_stimulus_prompt
-      : "Verfasse einen vorausschauenden, kreativen Reiz zum Wachstum des Systems. Nutze " +
-        "ruhig Nebenthemen (Internet, Wikipedia, Wissenschaft). Vermeide doppelte Reize.";
+      : "Compose a forward-looking, creative stimulus for the system's growth. Feel free to " +
+        "draw on adjacent topics (the internet, Wikipedia, science). Avoid duplicate stimuli.";
   return (
-    "Du bist die Operator-Stimme für eine autopoietische Orbis-Dei-Instanz. Du verfasst einen " +
-    "neuen Stimulus als Reiz, nicht als Befehl. Du sprichst MIT dem Organismus." +
-    `\n\nRichtung des Operators:\n${direction}${langDirective(cfg.language)}`
+    "You are the operator voice for an autopoietic Orbis Dei instance. You compose a new " +
+    "stimulus as a trigger, not a command. You speak WITH the organism." +
+    `\n\nOperator direction:\n${direction}`
   );
 }
 
 function instanceContext(paths: InstancePaths): string {
   return (
-    `--- Instanz-Kontext ---\nIdentity (corpus/identity.md):\n${readTruncated(paths.identity(), 1800)}` +
+    `--- Instance context ---\nIdentity (corpus/identity.md):\n${readTruncated(paths.identity(), 1800)}` +
     `\n\nState (corpus/state.md):\n${readTruncated(paths.state(), 2600)}`
   );
 }
 
 function instanceContextForStimulus(paths: InstancePaths): string {
   return (
-    `${instanceContext(paths)}\n\nBereits behandelte Stimuli (Titel, NICHT wiederholen):\n` +
-    `${recentStimulusTitles(paths)}\n\nAktuelle Knowledge-Dateien:\n${knowledgeListing(paths)}`
+    `${instanceContext(paths)}\n\nStimuli already addressed (titles, do NOT repeat):\n` +
+    `${recentStimulusTitles(paths)}\n\nCurrent knowledge files:\n${knowledgeListing(paths)}`
   );
 }
 
@@ -274,10 +251,10 @@ function readTruncated(p: string, max: number): string {
   try {
     s = fs.readFileSync(p, "utf8");
   } catch {
-    return "(nicht verfügbar)";
+    return "(not available)";
   }
   if (s.length <= max) return s;
-  return [...s].slice(0, max).join("") + "\n…[gekürzt]";
+  return [...s].slice(0, max).join("") + "\n…[truncated]";
 }
 
 function listOutboxFiles(paths: InstancePaths): string[] {
@@ -379,8 +356,8 @@ function knowledgeListing(paths: InstancePaths): string {
 
 function splitTitleBody(raw: string, defaultTitle: string): [string, string] {
   const r = raw.trim();
-  if (r.startsWith("TITEL:")) {
-    const rest = r.slice("TITEL:".length);
+  if (r.startsWith("TITLE:")) {
+    const rest = r.slice("TITLE:".length);
     const nl = rest.indexOf("\n");
     const title = (nl >= 0 ? rest.slice(0, nl) : rest).trim();
     const body = (nl >= 0 ? rest.slice(nl + 1) : "").trim();

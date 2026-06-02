@@ -196,25 +196,25 @@ function phaseUserSuffix(phase: Phase, loopN: number): string {
         "their own lines):\n" +
         "\n" +
         "<!-- STATE_NARRATIVE_START -->\n" +
-        "## Selbstzustand\n" +
+        "## Self-state\n" +
         "(2–4 sentences: where this instance actually stands now, after N loops)\n" +
         "\n" +
-        "## Kürzlich beobachtete Diskrepanzen\n" +
-        "(concrete discrepancies between identity.md and lived reality; or \"Keine\")\n" +
+        "## Recently observed discrepancies\n" +
+        "(concrete discrepancies between identity.md and lived reality; or \"None\")\n" +
         "\n" +
-        "## Loops seit letztem Stimulus\n" +
+        "## Loops since last stimulus\n" +
         "(integer; carry the current value forward unless a new stimulus arrived)\n" +
         "\n" +
-        "## Aktive Capabilities\n" +
-        "(list, or 'Keine')\n" +
+        "## Active capabilities\n" +
+        "(list, or 'None')\n" +
         "\n" +
-        "## Aktuelle Tools\n" +
-        "(list under tools/native/, or 'Keine')\n" +
+        "## Current tools\n" +
+        "(list under tools/native/, or 'None')\n" +
         "\n" +
-        "## Letzte Überinstanz-Wahl\n" +
+        "## Last superinstance election\n" +
         "(one sentence summarizing what Elect decided this loop)\n" +
         "\n" +
-        "## Erinnerungs-Notizen\n" +
+        "## Memory notes\n" +
         "(anything worth carrying into the next loop)\n" +
         "<!-- STATE_NARRATIVE_END -->\n" +
         "\n" +
@@ -222,7 +222,7 @@ function phaseUserSuffix(phase: Phase, loopN: number): string {
         "what was decided, what was modified, and one sentence on the felt state. " +
         "This is what becomes loop-NNNNN-final.md (the markers themselves are stripped).\n" +
         "\n" +
-        "Do not write a `# State — Loop N` heading or `## Identifikation` block inside " +
+        "Do not write a `# State — Loop N` heading or `## Identification` block inside " +
         "the STATE_NARRATIVE — the app rebuilds those mechanically.\n";
       break;
     default:

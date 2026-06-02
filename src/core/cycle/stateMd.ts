@@ -35,7 +35,7 @@ export function readCounter(statePath: string): number {
 /**
  * Apply integrate-side state.md updates:
  * - bump Loop-Counter to `newCounter`
- * - set Letzte Phase line to `integrate`
+ * - set the `Last phase` line to `integrate`
  * - append a Last integrate timestamp line (or update if present)
  */
 export function applyIntegrate(
@@ -66,20 +66,20 @@ function bumpCounter(content: string, newCounter: number): string {
 }
 
 function setLastPhase(content: string, value: string): string {
-  const re = /^([\-\*\s]*Letzte Phase\s*:\s*).*$/m;
+  const re = /^([\-\*\s]*Last phase\s*:\s*).*$/im;
   if (re.test(content)) {
     return content.replace(re, (_full, p1: string) => `${p1}${value}`);
   }
   // append a marker if the template was edited away
-  return `${trimEnd(content)}\n- Letzte Phase: ${value}\n`;
+  return `${trimEnd(content)}\n- Last phase: ${value}\n`;
 }
 
 function upsertLastIntegrate(content: string, nowRfc: string): string {
-  const re = /^([\-\*\s]*Letzte Integrate\s*:\s*).*$/m;
+  const re = /^([\-\*\s]*Last integrate\s*:\s*).*$/im;
   if (re.test(content)) {
     return content.replace(re, (_full, p1: string) => `${p1}${nowRfc}`);
   }
-  return `${trimEnd(content)}\n- Letzte Integrate: ${nowRfc}\n`;
+  return `${trimEnd(content)}\n- Last integrate: ${nowRfc}\n`;
 }
 
 /**
@@ -123,7 +123,7 @@ export function splitIntegrateOutput(
 
 /**
  * Rebuild state.md with a fresh mechanical header and a model-supplied narrative.
- * Preserves the Geburtstag and Wirt fields from the existing state.md.
+ * Preserves the Born and Host fields from the existing state.md.
  */
 export function rebuildWithNarrative(
   statePath: string,
@@ -132,18 +132,18 @@ export function rebuildWithNarrative(
   narrative: string,
 ): void {
   const current = readOrDefault(statePath);
-  const geburtstag = extractField(current, "Geburtstag") ?? nowRfc;
-  const host = extractField(current, "Wirt") ?? "Orbis Dei Habitat";
+  const born = extractField(current, "Born") ?? nowRfc;
+  const host = extractField(current, "Host") ?? "Orbis Dei Habitat";
 
   const content =
     `# State — Loop ${newCounter}\n` +
     `\n` +
-    `## Identifikation\n` +
+    `## Identification\n` +
     `- Loop-Counter: ${newCounter}\n` +
-    `- Geburtstag: ${geburtstag}\n` +
-    `- Letzte Phase: integrate\n` +
-    `- Letzte Integrate: ${nowRfc}\n` +
-    `- Wirt: ${host}\n` +
+    `- Born: ${born}\n` +
+    `- Last phase: integrate\n` +
+    `- Last integrate: ${nowRfc}\n` +
+    `- Host: ${host}\n` +
     `\n` +
     `${narrative.trim()}\n`;
   writeAtomic(statePath, content);

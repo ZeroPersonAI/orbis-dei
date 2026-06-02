@@ -8,7 +8,7 @@ import { NewInstanceDialog } from "../components/NewInstanceDialog";
 import { InstanceCard } from "../components/InstanceCard";
 import { GovernorBadge } from "../components/GovernorBadge";
 import { useRunningDaemonCount } from "../lib/daemon-events";
-import { useT, LanguageSwitcher } from "../lib/i18n";
+import { useT } from "../lib/i18n";
 
 interface Props {
   onOpenSettings: () => void;
@@ -50,10 +50,9 @@ export function HabitatView({ onOpenSettings, onOpenInstance }: Props) {
     name: string,
     routingMode: RoutingMode,
     phaseRouting: string | undefined,
-    language: string,
   ) {
     try {
-      await api.createInstance(name, routingMode, phaseRouting, language);
+      await api.createInstance(name, routingMode, phaseRouting);
       setShowNew(false);
       await refresh();
     } catch (e) {
@@ -117,7 +116,6 @@ export function HabitatView({ onOpenSettings, onOpenInstance }: Props) {
               ⏸ {t("Pause All")} ({runningDaemons})
             </button>
           )}
-          <LanguageSwitcher />
           <button
             onClick={onOpenSettings}
             title={t("Settings")}

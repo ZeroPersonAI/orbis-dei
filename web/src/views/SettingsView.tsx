@@ -6,7 +6,7 @@ import {
   type RoutingMode,
   type Settings,
 } from "../lib/tauri-bindings";
-import { useT, LanguageSwitcher } from "../lib/i18n";
+import { useT } from "../lib/i18n";
 
 interface Props {
   onBack: () => void;
@@ -226,14 +226,6 @@ export function SettingsView({ onBack }: Props) {
 
       <main className="flex-1 overflow-auto p-6">
         <div className="max-w-2xl mx-auto">
-        {/* Language */}
-        <section className="mb-8">
-          <h2 className="text-sm font-medium text-neutral-300 mb-1">
-            {t("Language")}
-          </h2>
-          <LanguageSwitcher />
-        </section>
-
         {/* Anthropic API key */}
         <section className="mb-8">
           <h2 className="text-sm font-medium text-neutral-300 mb-1">

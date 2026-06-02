@@ -5,8 +5,8 @@ import * as fs from "node:fs";
 import * as path from "node:path";
 import { fileURLToPath } from "node:url";
 
-export type Lang = "en" | "de" | "zh" | "es" | "fr";
-export const LANGS: Lang[] = ["en", "de", "zh", "es", "fr"];
+export type Lang = "en";
+export const LANGS: Lang[] = ["en"];
 export const DEFAULT_LANG: Lang = "en";
 
 export function normalizeLang(s: string | null | undefined): Lang {
@@ -24,14 +24,11 @@ function read(lang: Lang, rel: string): string {
   const hit = cache.get(key);
   if (hit !== undefined) return hit;
   let content = "";
-  for (const l of [lang, "en", "de"] as Lang[]) {
-    const p = path.join(TPL, l, rel);
-    try {
-      content = fs.readFileSync(p, "utf8");
-      break;
-    } catch {
-      /* try next fallback */
-    }
+  const p = path.join(TPL, lang, rel);
+  try {
+    content = fs.readFileSync(p, "utf8");
+  } catch {
+    /* missing template → empty string */
   }
   cache.set(key, content);
   return content;
@@ -46,12 +43,12 @@ export function renderStateMd(createdAt: string, lang: Lang): string {
 }
 
 const STANDING = [
-  "sc-001-phasen-disziplin.md",
-  "sc-002-state-aktualitaet.md",
+  "sc-001-phase-discipline.md",
+  "sc-002-state-currency.md",
   "sc-003-knowledge-budget.md",
-  "sc-004-election-diversitaet.md",
-  "sc-005-tool-diversitaet.md",
-  "sc-006-stimuli-pflicht.md",
+  "sc-004-election-diversity.md",
+  "sc-005-tool-diversity.md",
+  "sc-006-stimuli-duty.md",
   "sc-007-boredom-detection.md",
 ];
 

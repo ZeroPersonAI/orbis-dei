@@ -84,9 +84,8 @@ CLAUDE.md            the constitution
 ```
 
 The on-disk `state.md` carries a small **machine-parsed block** that the runtime
-reads and rewrites — `Loop-Counter`, `Geburtstag` (birth), `Letzte Phase`,
-`Letzte Integrate`, `Wirt` (host). These field labels are stable across all
-languages so the parsers never break.
+reads and rewrites — `Loop-Counter`, `Born`, `Last phase`, `Last integrate`,
+`Host`. These field labels are fixed so the parsers stay simple.
 
 ![Anatomy: each folder of the organism mapped to a biological role](figures/02-anatomy.png)
 *The filesystem is the body — and every part of it has a biological role.*
@@ -375,17 +374,15 @@ observer in real time, without that observation being able to act.
 
 ---
 
-## 15. Many tongues, one body: language
+## 15. One language: English
 
-**Technical.** UI chrome is multilingual (English, German, Chinese, Spanish,
-French) via a lightweight gettext-style layer — the English source string is the
-key, missing translations fall back to English. Independently, each organism is
-*born in a chosen language*: its constitution, state, standing concerns, and loop
-prompts come from `assets/templates/<lang>/`, while the machine-parsed `state.md`
-fields stay constant so parsers never break.
+**Technical.** The system is English throughout — the UI, the constitution and
+loop prompts in `assets/templates/en/`, and the text the organism generates. A
+thin `t()` layer wraps user-facing strings (English source as key) so the UI
+stays declarative, but there is a single language.
 
-**Metaphor.** The body is the same regardless of the language it thinks in; only
-the words of its self-description differ.
+**Metaphor.** One body, one tongue — no translation layer between what the
+organism is and how it describes itself.
 
 ---
 

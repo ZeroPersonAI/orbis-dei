@@ -5,7 +5,7 @@ import {
   type RoutingMode,
 } from "../lib/tauri-bindings";
 import { RoutingEditor, parsePhaseMap } from "./RoutingEditor";
-import { useT, LOCALES } from "../lib/i18n";
+import { useT } from "../lib/i18n";
 
 interface Props {
   onCancel: () => void;
@@ -13,14 +13,12 @@ interface Props {
     name: string,
     routingMode: RoutingMode,
     phaseRouting: string | undefined,
-    language: string,
   ) => Promise<void>;
 }
 
 export function NewInstanceDialog({ onCancel, onConfirm }: Props) {
   const { t } = useT();
   const [name, setName] = useState("");
-  const [language, setLanguage] = useState("en");
   const [routing, setRouting] = useState<RoutingMode>("anthropic");
   const [phaseMap, setPhaseMap] = useState<Record<string, Provider>>(
     parsePhaseMap(null),
@@ -47,7 +45,7 @@ export function NewInstanceDialog({ onCancel, onConfirm }: Props) {
     try {
       const phaseRouting =
         routing === "custom" ? JSON.stringify(phaseMap) : undefined;
-      await onConfirm(name.trim(), routing, phaseRouting, language);
+      await onConfirm(name.trim(), routing, phaseRouting);
     } finally {
       setSubmitting(false);
     }
@@ -76,30 +74,10 @@ export function NewInstanceDialog({ onCancel, onConfirm }: Props) {
           type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          placeholder={t("e.g. lauf-3-alpha")}
+          placeholder={t("e.g. alpha-1")}
           className="w-full bg-neutral-950 border border-neutral-800 rounded px-3 py-2 text-sm focus:outline-none focus:border-neutral-600 mb-4"
           maxLength={120}
         />
-
-        <label className="block text-xs text-neutral-400 mb-1.5">
-          {t("Organism language")}
-        </label>
-        <select
-          value={language}
-          onChange={(e) => setLanguage(e.target.value)}
-          className="w-full bg-neutral-950 border border-neutral-800 rounded px-3 py-2 text-sm focus:outline-none focus:border-neutral-600 mb-1.5"
-        >
-          {LOCALES.map((l) => (
-            <option key={l.code} value={l.code}>
-              {l.label}
-            </option>
-          ))}
-        </select>
-        <p className="text-[10px] text-neutral-600 mb-4">
-          {t(
-            "The language the organism is born in — its constitution, state, and loop prompts. Independent of the interface language.",
-          )}
-        </p>
 
         <RoutingEditor
           routingMode={routing}
