@@ -31,6 +31,16 @@ yet tag releases.
   organism at Loop 1.
 - Settings UI text corrected: secrets are stored in an encrypted file in the
   data directory, not the macOS Keychain.
+- Loop robustness — self-correcting phases. A phase that fails a *mechanical*
+  check (too-thin SC-001 output, or a Review not beginning with `PASS`/`FAIL`)
+  is now re-called up to twice with the concrete failure reason appended, before
+  the loop fails. Integrity failures (a deliberate Review `FAIL`, SP-I invariant
+  violations, missing prior-phase files) still roll back immediately and are
+  never retried.
+- Loop robustness — a single rolled-back loop no longer kills the daemon. Soft
+  failures are retried on the next loop; the daemon only stops on an
+  unrecoverable config error or after three consecutive failures, so a transient
+  thin loop can no longer park an instance in `error`.
 
 ### Fixed
 - Pause now emits `daemon:stopped` immediately (instead of only when the

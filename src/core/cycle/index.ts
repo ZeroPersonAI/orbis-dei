@@ -26,7 +26,11 @@ import {
   failureSummary,
   type InvariantReport,
 } from "./invariants.ts";
-import { substanceMetrics, meetsThreshold } from "./substance.ts";
+import { substanceMetrics, meetsThreshold, type SubstanceMetrics } from "./substance.ts";
+
+// #1 self-correcting phase retry: how many times a phase is re-called with
+// corrective feedback after a mechanical/format failure before the loop fails.
+const MAX_PHASE_RETRIES = 2;
 
 export interface PhaseOutcome {
   phase: string;
@@ -222,56 +226,125 @@ async function runSinglePhase(
   networkAllowlist: string[],
   lang: Lang,
 ): Promise<PhaseOutcome> {
-  const parts: PromptParts = buildPrompt(paths, phase, loopN, lang);
-  const response: ChatResponse = await router.call(phase, parts, instanceId, state.governor, state.db);
+  const base: PromptParts = buildPrompt(paths, phase, loopN, lang);
 
-  const rawBody = phaseBody(response);
+  // #1 Self-correcting retry. A phase can fail two ways: a *mechanical/format*
+  // failure the model can fix by re-emitting (too-thin SC-001 output, or a
+  // Review not starting with PASS/FAIL), or an *integrity* failure that must
+  // roll back (Review FAIL verdict, SP-I invariants, missing prior files). We
+  // re-call the phase up to MAX_PHASE_RETRIES times for the former, appending
+  // the concrete reason; the latter throw straight through to rollback.
+  let correction = "";
+  for (let attempt = 0; ; attempt++) {
+    const parts: PromptParts =
+      correction === "" ? base : { ...base, dynamicUser: base.dynamicUser + correction };
+    const response: ChatResponse = await router.call(phase, parts, instanceId, state.governor, state.db);
 
-  let body =
-    phase === "expand"
-      ? await processExpand(rawBody, allowToolExecution, networkPolicy, networkAllowlist, paths.root)
-      : rawBody;
+    const rawBody = phaseBody(response);
+    const body =
+      phase === "expand"
+        ? await processExpand(rawBody, allowToolExecution, networkPolicy, networkAllowlist, paths.root)
+        : rawBody;
 
-  // SC-001 substance check. For Expand, measure the model's raw output, not the
-  // code-composed (legitimately compact) episodic body.
-  const sc001Input = phase === "expand" ? rawBody : body;
-  ensurePhaseSubstance(phase, sc001Input, 10);
-
-  if (phase === "review") {
-    verifyReviewDecision(response.content);
-    verifyAllPriorPhaseFiles(paths, loopN);
-
-    const report: InvariantReport = verifyInvariants(paths, loopN);
-    if (networkPolicy === "open") {
-      report.warnings.push(
-        "Network policy: OPEN — sandbox firewall disabled, all tools have raw " +
-          "network access. This is the explicit exploration mode; flip it back " +
-          "in Settings once you are done.",
-      );
-    } else if (networkPolicy === "gated") {
-      report.warnings.push(
-        `Network policy: GATED — sandbox allows TCP 80/443 to ${networkAllowlist.length} ` +
-          `allowlisted host(s).`,
-      );
-    }
-    body += toMarkdown(report);
-    if (!allPassed(report)) {
+    // SC-001 substance check (retryable). For Expand, measure the model's raw
+    // output, not the code-composed (legitimately compact) episodic body.
+    const sc001Input = phase === "expand" ? rawBody : body;
+    const m = substanceMetrics(sc001Input);
+    if (!meetsThreshold(m, 10)) {
+      if (attempt < MAX_PHASE_RETRIES) {
+        correction = substanceCorrection(phase, m);
+        continue;
+      }
       throw new AppError(
         "invalid_input",
-        `SP-I invariant violation — rolling back:\n${failureSummary(report)}`,
+        `phase ${phase} produced only ${m.lines} substantive lines and ${m.chars} substantive ` +
+          `characters (SC-001 requires 10 lines OR 600 characters) after ${MAX_PHASE_RETRIES + 1} attempts`,
       );
     }
+
+    if (phase === "review") {
+      const firstLine = response.content.trim().split("\n")[0]?.trim() ?? "";
+      const decision = firstLine.toUpperCase();
+      // Malformed verdict line is a format error → retryable.
+      if (decision !== "PASS" && decision !== "FAIL") {
+        if (attempt < MAX_PHASE_RETRIES) {
+          correction =
+            "\n\n## Correction — malformed review\nYour review MUST begin with a single line that " +
+            "is exactly `PASS` or `FAIL` (uppercase, nothing else on that line), then a blank line, " +
+            "then your per-check reasoning. Re-emit the whole review correctly.";
+          continue;
+        }
+        throw new AppError(
+          "invalid_input",
+          `review phase first line was not PASS or FAIL after ${MAX_PHASE_RETRIES + 1} attempts: ` +
+            JSON.stringify(firstLine),
+        );
+      }
+      // A deliberate FAIL verdict is an integrity decision → roll back, never retry.
+      if (decision === "FAIL") {
+        throw new AppError(
+          "invalid_input",
+          `review phase returned FAIL — rolling back. Reasoning:\n${response.content.trim()}`,
+        );
+      }
+
+      // PASS — the remaining checks are integrity gates, not retryable.
+      verifyAllPriorPhaseFiles(paths, loopN);
+      const report: InvariantReport = verifyInvariants(paths, loopN);
+      if (networkPolicy === "open") {
+        report.warnings.push(
+          "Network policy: OPEN — sandbox firewall disabled, all tools have raw " +
+            "network access. This is the explicit exploration mode; flip it back " +
+            "in Settings once you are done.",
+        );
+      } else if (networkPolicy === "gated") {
+        report.warnings.push(
+          `Network policy: GATED — sandbox allows TCP 80/443 to ${networkAllowlist.length} ` +
+            `allowlisted host(s).`,
+        );
+      }
+      const reviewBody = body + toMarkdown(report);
+      if (!allPassed(report)) {
+        throw new AppError(
+          "invalid_input",
+          `SP-I invariant violation — rolling back:\n${failureSummary(report)}`,
+        );
+      }
+      const episodicPath = writePhaseFile(paths, loopN, phase, reviewBody);
+      return {
+        phase,
+        episodic_path: episodicPath,
+        input_tokens: response.inputTokens,
+        output_tokens: response.outputTokens,
+        latency_ms: response.latencyMs,
+      };
+    }
+
+    const episodicPath = writePhaseFile(paths, loopN, phase, body);
+    return {
+      phase,
+      episodic_path: episodicPath,
+      input_tokens: response.inputTokens,
+      output_tokens: response.outputTokens,
+      latency_ms: response.latencyMs,
+    };
   }
+}
 
-  const episodicPath = writePhaseFile(paths, loopN, phase, body);
-
-  return {
-    phase,
-    episodic_path: episodicPath,
-    input_tokens: response.inputTokens,
-    output_tokens: response.outputTokens,
-    latency_ms: response.latencyMs,
-  };
+/** Corrective feedback appended to a phase prompt after a too-thin SC-001 output. */
+function substanceCorrection(phase: Phase, m: SubstanceMetrics): string {
+  const extra =
+    phase === "expand"
+      ? " For Expand specifically: write a richer INTENT block and/or a real FILE_WRITE block with " +
+        "actual file content — markers with no body beneath them are thin and count for little."
+      : "";
+  return (
+    "\n\n## Correction — output too thin\n" +
+    `Your previous ${phase} output had only ${m.lines} substantive lines and ${m.chars} characters. ` +
+    "SC-001 requires at least 10 substantive lines OR 600 characters, or the whole loop is rejected " +
+    "and rolled back. Re-do this phase now with real substance." +
+    extra
+  );
 }
 
 function recordPhaseEvent(
@@ -378,18 +451,6 @@ function ensurePhaseSubstance(phase: Phase, body: string, minLines: number): voi
     `phase ${phase} produced only ${m.lines} substantive lines and ${m.chars} substantive characters ` +
       `(SC-001 requires ${minLines} lines OR ${minLines * 60} characters)`,
   );
-}
-
-function verifyReviewDecision(content: string): void {
-  const firstLine = content.trim().split("\n")[0]?.trim() ?? "";
-  if (firstLine.toUpperCase() === "PASS") return;
-  if (firstLine.toUpperCase() === "FAIL") {
-    throw new AppError(
-      "invalid_input",
-      `review phase returned FAIL — rolling back. Reasoning:\n${content.trim()}`,
-    );
-  }
-  throw new AppError("invalid_input", `review phase first line was not PASS or FAIL: ${JSON.stringify(firstLine)}`);
 }
 
 function verifyAllPriorPhaseFiles(paths: InstancePaths, loopN: number): void {

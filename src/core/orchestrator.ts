@@ -99,6 +99,13 @@ export class Orchestrator {
   private async daemonBody(instanceId: string, cancel: CancellationToken): Promise<void> {
     let exitReason = "manual";
 
+    // #2 How many rolled-back loops in a row before the daemon gives up. A
+    // single soft failure (thin output, a Review/invariant rollback) is not
+    // fatal — the daemon retries the loop. Only a sustained streak (or an
+    // unrecoverable config error) stops it, so it never burns budget forever.
+    const MAX_CONSECUTIVE_FAILURES = 3;
+    let consecutiveFailures = 0;
+
     while (!cancel.isCancelled) {
       let inst: instance.Instance;
       let boredomThreshold: number;
@@ -117,6 +124,7 @@ export class Orchestrator {
 
       try {
         const result = await runOneCycle(inst, this.state, cancel);
+        consecutiveFailures = 0;
         const nextBoredom = result.inbox_was_empty ? inst.loops_since_last_stimulus + 1 : 0;
         try {
           this.state.db
@@ -134,9 +142,23 @@ export class Orchestrator {
           exitReason = "manual";
           break;
         }
-        this.markStatus(instanceId, "error", inst.loop_counter);
-        exitReason = "error";
-        break;
+        // #2 The cycle already rolled the working tree back. A soft failure is
+        // not fatal: count it and try the next loop. Only an unrecoverable
+        // config error, or too many failures in a row, stops the daemon.
+        consecutiveFailures += 1;
+        const unrecoverable = err.kind === "missing_config";
+        if (unrecoverable || consecutiveFailures >= MAX_CONSECUTIVE_FAILURES) {
+          this.markStatus(instanceId, "error", inst.loop_counter);
+          exitReason = "error";
+          break;
+        }
+        this.state.events.emit("loop:retry", {
+          instance_id: instanceId,
+          loop: inst.loop_counter,
+          attempt: consecutiveFailures,
+          max: MAX_CONSECUTIVE_FAILURES,
+          reason: err.message,
+        });
       }
 
       // Inter-loop pause with a fast cancellation path.
