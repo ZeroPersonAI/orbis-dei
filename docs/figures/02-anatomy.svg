@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -60 1120 1120" width="1120" height="1120" font-family="system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <defs>
+    <radialGradient id="bg2" cx="50%" cy="30%" r="80%"><stop offset="0%" stop-color="#0e1a16"/><stop offset="100%" stop-color="#070808"/></radialGradient>
+    <linearGradient id="dot" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#6ee7b7"/><stop offset="100%" stop-color="#2dd4bf"/></linearGradient>
+  </defs>
+  <rect x="0" y="-60" width="1120" height="1120" fill="url(#bg2)"/>
+  <text x="60" y="78" fill="#e8eef0" font-size="38" font-weight="600">The body is a filesystem</text>
+  <text x="60" y="118" fill="#7e8f88" font-size="23">one organism = one git-versioned directory</text>
+  <text x="120" y="170" fill="#5b6b63" font-size="19" font-weight="600" letter-spacing="2">ON DISK</text>
+  <text x="600" y="170" fill="#5b6b63" font-size="19" font-weight="600" letter-spacing="2">BIOLOGICAL ROLE</text>
+
+  <g font-size="24">
+    <!-- row template: card + dot + mono path + role + note -->
+    <!-- 1 -->
+    <rect x="60" y="192" width="1000" height="84" rx="12" fill="#0d1411" stroke="#1f2a26"/>
+    <circle cx="92" cy="234" r="6" fill="url(#dot)"/>
+    <text x="120" y="242" fill="#6ee7b7" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="23">corpus/identity.md</text>
+    <text x="600" y="226" fill="#e8eef0" font-weight="600">Genome</text>
+    <text x="600" y="256" fill="#7e8f88" font-size="20">immutable core — who it is</text>
+    <!-- 2 -->
+    <rect x="60" y="288" width="1000" height="84" rx="12" fill="#0d1411" stroke="#1f2a26"/>
+    <circle cx="92" cy="330" r="6" fill="url(#dot)"/>
+    <text x="120" y="338" fill="#6ee7b7" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="23">corpus/state.md</text>
+    <text x="600" y="322" fill="#e8eef0" font-weight="600">Physiological state</text>
+    <text x="600" y="352" fill="#7e8f88" font-size="20">rewritten every loop; the loop counter</text>
+    <!-- 3 -->
+    <rect x="60" y="384" width="1000" height="84" rx="12" fill="#0d1411" stroke="#1f2a26"/>
+    <circle cx="92" cy="426" r="6" fill="url(#dot)"/>
+    <text x="120" y="434" fill="#6ee7b7" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="23">corpus/episodic/</text>
+    <text x="600" y="418" fill="#e8eef0" font-weight="600">Memory</text>
+    <text x="600" y="448" fill="#7e8f88" font-size="20">append-only — you can't unlive a loop</text>
+    <!-- 4 -->
+    <rect x="60" y="480" width="1000" height="84" rx="12" fill="#0d1411" stroke="#1f2a26"/>
+    <circle cx="92" cy="522" r="6" fill="url(#dot)"/>
+    <text x="120" y="530" fill="#6ee7b7" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="23">stimuli/inbox · outbox</text>
+    <text x="600" y="514" fill="#e8eef0" font-weight="600">Senses &amp; voice</text>
+    <text x="600" y="544" fill="#7e8f88" font-size="20">coupling to the world (reize, not orders)</text>
+    <!-- 5 -->
+    <rect x="60" y="576" width="1000" height="84" rx="12" fill="#0d1411" stroke="#1f2a26"/>
+    <circle cx="92" cy="618" r="6" fill="url(#dot)"/>
+    <text x="120" y="626" fill="#6ee7b7" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="23">tools/native/</text>
+    <text x="600" y="610" fill="#e8eef0" font-weight="600">Enzymes</text>
+    <text x="600" y="640" fill="#7e8f88" font-size="20">capabilities it wrote for itself</text>
+    <!-- 6 -->
+    <rect x="60" y="672" width="1000" height="84" rx="12" fill="#0d1411" stroke="#1f2a26"/>
+    <circle cx="92" cy="714" r="6" fill="url(#dot)"/>
+    <text x="120" y="722" fill="#6ee7b7" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="23">loop/</text>
+    <text x="600" y="706" fill="#e8eef0" font-weight="600">Metabolism</text>
+    <text x="600" y="736" fill="#7e8f88" font-size="20">the six phase prompts — read-only</text>
+    <!-- 7 -->
+    <rect x="60" y="768" width="1000" height="84" rx="12" fill="#0d1411" stroke="#1f2a26"/>
+    <circle cx="92" cy="810" r="6" fill="url(#dot)"/>
+    <text x="120" y="818" fill="#6ee7b7" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="23">.git/</text>
+    <text x="600" y="802" fill="#e8eef0" font-weight="600">Skeleton &amp; fossil record</text>
+    <text x="600" y="832" fill="#7e8f88" font-size="20">every heartbeat a commit; instant rollback</text>
+  </g>
+</svg>

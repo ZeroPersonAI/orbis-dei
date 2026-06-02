@@ -4,3 +4,8 @@ web/dist/
 *.log
 .DS_Store
 data/
+
+# dev tooling / generated artifacts — not part of the public product
+/CLAUDE.md
+/tasks/
+web/src/lib/locales/_keys.json

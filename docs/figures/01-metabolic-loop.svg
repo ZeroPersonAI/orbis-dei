@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000" width="1000" height="1000" font-family="system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="42%" r="75%">
+      <stop offset="0%" stop-color="#0e1a16"/><stop offset="100%" stop-color="#070808"/>
+    </radialGradient>
+    <linearGradient id="ring" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#6ee7b7"/><stop offset="50%" stop-color="#10b981"/><stop offset="100%" stop-color="#2dd4bf"/>
+    </linearGradient>
+    <radialGradient id="core" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ecfdf5"/><stop offset="55%" stop-color="#5eead4"/><stop offset="100%" stop-color="#0d9488"/>
+    </radialGradient>
+    <filter id="glow" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <rect width="1000" height="1000" fill="url(#bg)"/>
+
+  <!-- the loop ring -->
+  <circle cx="500" cy="500" r="300" fill="none" stroke="url(#ring)" stroke-width="3" opacity="0.55" filter="url(#glow)"/>
+
+  <!-- clockwise direction chevrons -->
+  <g fill="#34d399" opacity="0.9">
+    <g transform="translate(650,240) rotate(30)"><path d="M -11,-8 L 12,0 L -11,8 Z"/></g>
+    <g transform="translate(800,500) rotate(90)"><path d="M -11,-8 L 12,0 L -11,8 Z"/></g>
+    <g transform="translate(650,760) rotate(150)"><path d="M -11,-8 L 12,0 L -11,8 Z"/></g>
+    <g transform="translate(350,760) rotate(210)"><path d="M -11,-8 L 12,0 L -11,8 Z"/></g>
+    <g transform="translate(200,500) rotate(270)"><path d="M -11,-8 L 12,0 L -11,8 Z"/></g>
+    <g transform="translate(350,240) rotate(330)"><path d="M -11,-8 L 12,0 L -11,8 Z"/></g>
+  </g>
+
+  <!-- center -->
+  <circle cx="500" cy="500" r="16" fill="url(#core)" filter="url(#glow)"/>
+  <text x="500" y="476" text-anchor="middle" fill="#e8eef0" font-size="30" font-weight="600" letter-spacing="3">THE METABOLIC LOOP</text>
+  <text x="500" y="540" text-anchor="middle" fill="#7e8f88" font-size="22">one loop = one heartbeat</text>
+
+  <!-- node helper: bubble + number + 2-line label -->
+  <!-- 1 Observe (top) -->
+  <g>
+    <circle cx="500" cy="200" r="46" fill="#0e1512" stroke="url(#ring)" stroke-width="3" filter="url(#glow)"/>
+    <text x="500" y="212" text-anchor="middle" fill="#6ee7b7" font-size="34" font-weight="700">1</text>
+    <text x="500" y="118" text-anchor="middle" fill="#e8eef0" font-size="27" font-weight="600">Observe</text>
+    <text x="500" y="146" text-anchor="middle" fill="#7e8f88" font-size="21">perception</text>
+  </g>
+  <!-- 2 Diverge (right-top) -->
+  <g>
+    <circle cx="760" cy="350" r="46" fill="#0e1512" stroke="url(#ring)" stroke-width="3" filter="url(#glow)"/>
+    <text x="760" y="362" text-anchor="middle" fill="#6ee7b7" font-size="34" font-weight="700">2</text>
+    <text x="824" y="344" text-anchor="start" fill="#e8eef0" font-size="27" font-weight="600">Diverge</text>
+    <text x="824" y="372" text-anchor="start" fill="#7e8f88" font-size="21">variation</text>
+  </g>
+  <!-- 3 Elect (right-bottom) -->
+  <g>
+    <circle cx="760" cy="650" r="46" fill="#0e1512" stroke="url(#ring)" stroke-width="3" filter="url(#glow)"/>
+    <text x="760" y="662" text-anchor="middle" fill="#6ee7b7" font-size="34" font-weight="700">3</text>
+    <text x="824" y="644" text-anchor="start" fill="#e8eef0" font-size="27" font-weight="600">Elect</text>
+    <text x="824" y="672" text-anchor="start" fill="#7e8f88" font-size="21">selection</text>
+  </g>
+  <!-- 4 Expand (bottom) -->
+  <g>
+    <circle cx="500" cy="800" r="46" fill="#0e1512" stroke="url(#ring)" stroke-width="3" filter="url(#glow)"/>
+    <text x="500" y="812" text-anchor="middle" fill="#6ee7b7" font-size="34" font-weight="700">4</text>
+    <text x="500" y="876" text-anchor="middle" fill="#e8eef0" font-size="27" font-weight="600">Expand</text>
+    <text x="500" y="904" text-anchor="middle" fill="#7e8f88" font-size="21">anabolism — building</text>
+  </g>
+  <!-- 5 Review (left-bottom) -->
+  <g>
+    <circle cx="240" cy="650" r="46" fill="#0e1512" stroke="url(#ring)" stroke-width="3" filter="url(#glow)"/>
+    <text x="240" y="662" text-anchor="middle" fill="#6ee7b7" font-size="34" font-weight="700">5</text>
+    <text x="176" y="644" text-anchor="end" fill="#e8eef0" font-size="27" font-weight="600">Review</text>
+    <text x="176" y="672" text-anchor="end" fill="#7e8f88" font-size="21">homeostasis</text>
+  </g>
+  <!-- 6 Integrate (left-top) -->
+  <g>
+    <circle cx="240" cy="350" r="46" fill="#0e1512" stroke="url(#ring)" stroke-width="3" filter="url(#glow)"/>
+    <text x="240" y="362" text-anchor="middle" fill="#6ee7b7" font-size="34" font-weight="700">6</text>
+    <text x="176" y="344" text-anchor="end" fill="#e8eef0" font-size="27" font-weight="600">Integrate</text>
+    <text x="176" y="372" text-anchor="end" fill="#7e8f88" font-size="21">consolidation</text>
+  </g>
+</svg>

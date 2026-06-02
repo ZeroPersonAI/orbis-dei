@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -210 1200 1200" width="1200" height="1200" font-family="system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <defs>
+    <radialGradient id="bg3" cx="50%" cy="20%" r="90%"><stop offset="0%" stop-color="#0e1a16"/><stop offset="100%" stop-color="#070808"/></radialGradient>
+    <marker id="ah" markerWidth="9" markerHeight="9" refX="6" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 Z" fill="#7e8f88"/></marker>
+    <marker id="ahg" markerWidth="9" markerHeight="9" refX="6" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 Z" fill="#34d399"/></marker>
+    <marker id="ahr" markerWidth="9" markerHeight="9" refX="6" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 Z" fill="#ef4444"/></marker>
+  </defs>
+  <rect x="0" y="-210" width="1200" height="1200" fill="url(#bg3)"/>
+  <text x="600" y="58" text-anchor="middle" fill="#e8eef0" font-size="34" font-weight="600">The immune system: self-preservation as code</text>
+
+  <!-- top pill: the loop ran -->
+  <rect x="350" y="100" width="500" height="70" rx="35" fill="#0d1411" stroke="#1f2a26"/>
+  <text x="600" y="143" text-anchor="middle" fill="#cdd8d2" font-size="23" font-family="ui-monospace, Menlo, Consolas, monospace">observe → diverge → elect → expand</text>
+
+  <!-- arrow to review -->
+  <line x1="600" y1="170" x2="600" y2="232" stroke="#7e8f88" stroke-width="2.5" marker-end="url(#ah)"/>
+
+  <!-- review box -->
+  <rect x="410" y="236" width="380" height="104" rx="14" fill="#0d1411" stroke="#34d399" stroke-width="2"/>
+  <text x="600" y="280" text-anchor="middle" fill="#6ee7b7" font-size="26" font-weight="700" letter-spacing="2">REVIEW</text>
+  <text x="600" y="312" text-anchor="middle" fill="#7e8f88" font-size="20">mechanical SP-I check via git status</text>
+
+  <!-- branches -->
+  <path d="M520,340 L300,432" fill="none" stroke="#ef4444" stroke-width="2.5" marker-end="url(#ahr)"/>
+  <text x="350" y="392" text-anchor="middle" fill="#ef4444" font-size="22" font-weight="700">FAIL</text>
+  <path d="M680,340 L900,432" fill="none" stroke="#34d399" stroke-width="2.5" marker-end="url(#ahg)"/>
+  <text x="850" y="392" text-anchor="middle" fill="#34d399" font-size="22" font-weight="700">PASS</text>
+
+  <!-- FAIL box (apoptosis) -->
+  <rect x="70" y="438" width="470" height="120" rx="14" fill="#160d0d" stroke="#5b2424" stroke-width="2"/>
+  <text x="305" y="482" text-anchor="middle" fill="#fca5a5" font-size="24" font-weight="600">Rollback — apoptosis</text>
+  <text x="305" y="514" text-anchor="middle" fill="#9a8a8a" font-size="19" font-family="ui-monospace, Menlo, Consolas, monospace">git reset --hard &lt;anchor&gt;</text>
+  <text x="305" y="540" text-anchor="middle" fill="#9a8a8a" font-size="19" font-family="ui-monospace, Menlo, Consolas, monospace">git clean -fd</text>
+
+  <!-- PASS box -->
+  <rect x="660" y="438" width="470" height="120" rx="14" fill="#0c1611" stroke="#245b3a" stroke-width="2"/>
+  <text x="895" y="482" text-anchor="middle" fill="#86efac" font-size="24" font-weight="600">Integrate — consolidation</text>
+  <text x="895" y="514" text-anchor="middle" fill="#8aa394" font-size="19">rewrite state.md · archive stimuli</text>
+  <text x="895" y="540" text-anchor="middle" fill="#8aa394" font-size="19" font-family="ui-monospace, Menlo, Consolas, monospace">git commit "loop NNNNN" · counter++</text>
+
+  <!-- FAIL loops back to last healthy state -->
+  <path d="M70,498 C20,498 20,135 345,135" fill="none" stroke="#ef4444" stroke-width="2.2" stroke-dasharray="6 6" marker-end="url(#ahr)"/>
+  <text x="120" y="610" fill="#9a8a8a" font-size="19">back to the last verified-healthy commit</text>
+
+  <text x="600" y="700" text-anchor="middle" fill="#7e8f88" font-size="21">The model's qualitative verdict sits on top of this mechanical floor — never underneath it.</text>
+</svg>
