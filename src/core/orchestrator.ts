@@ -109,7 +109,7 @@ export class Orchestrator {
     // #2 How many rolled-back loops in a row before the daemon gives up. A
     // single soft failure (thin output, a Review/invariant rollback) is not
     // fatal — the daemon retries the loop. Only a sustained streak (or an
-    // unrecoverable config error) stops it, so it never burns budget forever.
+    // unrecoverable config error) stops it, so it never burns tokens forever.
     const MAX_CONSECUTIVE_FAILURES = 3;
     let consecutiveFailures = 0;
 

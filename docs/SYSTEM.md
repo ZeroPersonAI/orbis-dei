@@ -21,7 +21,7 @@ never *instructs*.
 | `corpus/episodic/` (append-only) | Memory |
 | The six-phase loop | Metabolism — one loop is one heartbeat |
 | SP-I invariant checks + git rollback | Immune system / apoptosis |
-| Governor (rate limits, budget, breaker) | Endocrine + circulatory regulation |
+| Governor (rate limits, breaker, fair queue) | Endocrine + circulatory regulation |
 | `sandbox-exec` jail | Cell membrane (selective permeability) |
 | `stimuli/` + boredom detection | Sensory coupling to a world |
 | `.git/` | Skeleton and fossil record |
@@ -250,23 +250,19 @@ caching on the system + stable-user parts.
 
 **Governor** — every call passes through it, in order:
 
-1. **Budget** — estimate cost; hard-stop on the daily / monthly USD ceiling or a
-   per-instance quota (defaults $5/day, $50/month).
-2. **Circuit breaker** — ≥ 3 rate-limit (429) responses in 60 s opens it for a
+1. **Circuit breaker** — ≥ 3 rate-limit (429) responses in 60 s opens it for a
    5-minute cool-down (or the provider's `Retry-After`).
-3. **Weighted-fair queue** — serializes calls across instances so a greedy one
+2. **Weighted-fair queue** — serializes calls across instances so a greedy one
    can't starve the others.
-4. **Token buckets** — RPM / input-TPM / output-TPM leaky buckets (defaults 50 /
+3. **Token buckets** — RPM / input-TPM / output-TPM leaky buckets (defaults 50 /
    30 000 / 8 000 per minute).
-5. The HTTP call, then a row written to the `inference_calls` ledger (provider,
-   model, tokens, cache tokens, cost, latency, rate-limited, queue wait).
-
-A static pricing table per model turns token usage into dollars.
+4. The HTTP call, then a row written to the `inference_calls` ledger (provider,
+   model, tokens, cache tokens, latency, rate-limited, queue wait).
 
 **Metaphor.** The circulatory and endocrine systems: they meter the flow of
 energy (tokens ≈ calories), throttle metabolism under load, and trip a stress
-response (the breaker) when the environment pushes back too hard. The budget is
-a caloric ceiling; the queue is fair perfusion across organs.
+response (the breaker) when the environment pushes back too hard. The queue is
+fair perfusion across organs.
 
 ---
 
@@ -294,7 +290,7 @@ possible but flagged as the dangerous, deliberate state it is.
 
 **Technical.** SQLite tables: `instances` (registry incl. routing, auto-mode
 config, language), `loop_events` (one row per phase: model, tokens, outcome,
-timestamps), `inference_calls` (the cost/latency ledger), `settings` (key/value).
+timestamps), `inference_calls` (the token/latency ledger), `settings` (key/value).
 Per-instance git provides per-loop commits and the rollback anchor. Secrets are
 AES-256-GCM in `secrets.enc`, keyed from `ORBIS_SECRET` or a `0600` key file.
 

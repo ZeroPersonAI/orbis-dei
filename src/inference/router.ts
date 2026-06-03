@@ -1,6 +1,6 @@
 // Per-phase provider routing. Each instance maps the six loop phases to a
 // provider (Anthropic | OpenAI | Gemini); the model for each provider comes from
-// global settings. Every call is governed (budget / rate-limits / breaker).
+// global settings. Every call is governed (rate-limits / breaker / fair queue).
 //
 // `call()` takes a `DB` directly (not an AppState), matching the synchronous
 // better-sqlite3 persistence layer.
