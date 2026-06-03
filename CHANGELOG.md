@@ -22,7 +22,21 @@ yet tag releases.
 - Global `unhandledRejection` / `uncaughtException` handlers so a background
   daemon or auto-mode error logs a stack trace instead of silently exiting.
 
+### Added
+- Per-instance **coupling level** (`mirror` / `gated` / `open`) — a single
+  selectable knob for how strongly an organism is coupled to the world. It
+  replaces the old global network/tool toggles: `mirror` = no network, no tools
+  (a closed mirror that only metabolizes its own corpus + operator stimuli);
+  `gated` = tools on, network limited to the allowlisted hosts; `open` = tools
+  on, raw network (red-warned each loop). Selectable when creating an instance
+  (defaults to `mirror`) and switchable live in the instance header. The
+  underlying sandbox / allowlist / warning / invariants are unchanged. Existing
+  instances are migrated from the previous global settings so behavior is
+  preserved; the host allowlist stays global (shared by Gated-coupled instances).
+
 ### Removed
+- Global `network_access` and `allow_tool_execution` settings — superseded by the
+  per-instance coupling level above.
 - Cost / budget tracking. The dollar-spend badge, the daily/monthly budget and
   per-instance quota settings, the pre-flight budget refusals, the per-model
   pricing table, and the `inference_calls.cost_usd` column are all gone (an

@@ -17,7 +17,7 @@ import { readCounter } from "../core/cycle/stateMd.ts";
 import { computeUnanimousStreak } from "../core/cycle/electResult.ts";
 import { walkRecentExpands } from "../core/cycle/expandLog.ts";
 import { verifyInvariants, allPassed } from "../core/cycle/invariants.ts";
-import { parseNetworkAccess } from "../core/cycle/sandbox.ts";
+import { couplingPolicy } from "../core/cycle/coupling.ts";
 import * as stimulus from "../core/stimulus.ts";
 import { chatAboutInstance, type ChatMessage } from "../core/chat.ts";
 import { InstanceWatcher } from "../watch.ts";
@@ -89,6 +89,7 @@ export function buildCommands(state: AppState): Record<string, CommandHandler> {
         a.name,
         a.routingMode ?? "",
         a.language ?? "en",
+        a.couplingLevel ?? "mirror",
         state.instancesDir,
       );
       if (a.phaseRouting && String(a.phaseRouting).trim().length > 0) {
@@ -99,6 +100,13 @@ export function buildCommands(state: AppState): Record<string, CommandHandler> {
         instance.updateRouting(state.db, inst.id, inst.routing_mode, inst.phase_routing);
       }
       return inst;
+    },
+
+    // Change an instance's coupling level (mirror/gated/open). A running daemon
+    // picks it up on its next loop (it re-reads the instance each iteration).
+    set_coupling_level: (a) => {
+      const level = instance.setCoupling(state.db, a.id, String(a.level));
+      return { id: a.id, coupling_level: level };
     },
     set_instance_routing: (a) => {
       validateRoutingMode(a.routingMode);
@@ -292,7 +300,8 @@ export function buildCommands(state: AppState): Record<string, CommandHandler> {
         unanimous_streak: streak.unanimousStreak,
         elect_markers_missing: streak.markersMissingInWindow,
         elect_window: streak.window,
-        network_access: s.network_access,
+        coupling_level: instance.get(state.db, a.id).coupling_level,
+        network_access: couplingPolicy(instance.get(state.db, a.id).coupling_level).networkPolicy,
         network_allowlist_len: s.network_allowlist.length,
       };
     },
@@ -417,7 +426,7 @@ export function buildCommands(state: AppState): Record<string, CommandHandler> {
           })),
         }));
       return {
-        current_policy: s.network_access,
+        current_policy: couplingPolicy(instance.get(state.db, a.id).coupling_level).networkPolicy,
         current_allowlist: s.network_allowlist,
         entries: reports,
         window: HISTORY_WINDOW,
@@ -440,7 +449,7 @@ export function buildCommands(state: AppState): Record<string, CommandHandler> {
         }
       })();
       const report = verifyInvariants(paths, loopN);
-      const policy = parseNetworkAccess(s.network_access);
+      const policy = couplingPolicy(instance.get(state.db, a.id).coupling_level).networkPolicy;
       if (policy === "open") {
         report.warnings.push(
           "Network policy: OPEN — sandbox firewall disabled, all tools have raw network access.",

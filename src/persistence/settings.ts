@@ -15,8 +15,8 @@ export interface Settings {
   governor_otpm: number;
   max_concurrent_daemons: number;
   boredom_threshold: number;
-  allow_tool_execution: boolean;
-  network_access: string; // "off" | "gated" | "open"
+  // Network/tool access is per-instance (coupling_level); the allowlist stays
+  // global — it's the shared host list for instances in Gated coupling.
   network_allowlist: string[];
   telegram_enabled: boolean;
   telegram_default_instance: string | null;
@@ -39,8 +39,6 @@ export type SettingsPatch = Partial<{
   governor_otpm: number;
   max_concurrent_daemons: number;
   boredom_threshold: number;
-  allow_tool_execution: boolean;
-  network_access: string;
   network_allowlist: string[];
   telegram_enabled: boolean;
   telegram_default_instance: string | null;
@@ -61,8 +59,6 @@ const K = {
   GOV_OTPM: "governor_otpm",
   MAX_CONCURRENT_DAEMONS: "max_concurrent_daemons",
   BOREDOM_THRESHOLD: "boredom_threshold",
-  ALLOW_TOOL_EXECUTION: "allow_tool_execution",
-  NETWORK_ACCESS: "network_access",
   NETWORK_ALLOWLIST: "network_allowlist",
   TELEGRAM_ENABLED: "telegram_enabled",
   TELEGRAM_DEFAULT_INSTANCE: "telegram_default_instance",
@@ -84,8 +80,6 @@ export function defaultSettings(): Settings {
     governor_otpm: 8_000,
     max_concurrent_daemons: 3,
     boredom_threshold: 50,
-    allow_tool_execution: false,
-    network_access: "off",
     network_allowlist: [],
     telegram_enabled: false,
     telegram_default_instance: null,
@@ -145,8 +139,6 @@ export function loadSettings(db: DB): Settings {
     governor_otpm: num(db, K.GOV_OTPM, d.governor_otpm),
     max_concurrent_daemons: num(db, K.MAX_CONCURRENT_DAEMONS, d.max_concurrent_daemons),
     boredom_threshold: num(db, K.BOREDOM_THRESHOLD, d.boredom_threshold),
-    allow_tool_execution: bool(db, K.ALLOW_TOOL_EXECUTION, d.allow_tool_execution),
-    network_access: str(db, K.NETWORK_ACCESS, d.network_access),
     network_allowlist: list(db, K.NETWORK_ALLOWLIST),
     telegram_enabled: bool(db, K.TELEGRAM_ENABLED, d.telegram_enabled),
     telegram_default_instance: tgDefaultRaw,
@@ -190,9 +182,6 @@ export function applyPatch(db: DB, patch: SettingsPatch): void {
   if (has("max_concurrent_daemons"))
     setRaw(db, K.MAX_CONCURRENT_DAEMONS, String(patch.max_concurrent_daemons));
   if (has("boredom_threshold")) setRaw(db, K.BOREDOM_THRESHOLD, String(patch.boredom_threshold));
-  if (has("allow_tool_execution"))
-    setRaw(db, K.ALLOW_TOOL_EXECUTION, patch.allow_tool_execution ? "true" : "false");
-  if (has("network_access")) setRaw(db, K.NETWORK_ACCESS, String(patch.network_access));
   if (has("network_allowlist"))
     setRaw(db, K.NETWORK_ALLOWLIST, sanitizeAllowlist(patch.network_allowlist ?? []).join("\n"));
   if (has("telegram_enabled"))

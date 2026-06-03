@@ -38,9 +38,14 @@ export interface Instance {
   /** JSON map {"<phase>":"<provider>"} when routing_mode === "custom". */
   phase_routing: string | null;
   loops_since_last_stimulus: number;
-  /** Organism language, chosen at creation: "en"|"de"|"zh"|"es"|"fr". */
+  /** Organism language, chosen at creation. Always "en". */
   language?: string;
+  /** How strongly this organism is coupled to the world. */
+  coupling_level: CouplingLevel;
 }
+
+/** Coupling ladder: mirror (no net/tools) → gated (tools + allowlisted net) → open (tools + raw net). */
+export type CouplingLevel = "mirror" | "gated" | "open";
 
 export interface PhaseOutcome {
   phase: string;
@@ -84,8 +89,6 @@ export interface Settings {
   governor_otpm: number;
   max_concurrent_daemons: number;
   boredom_threshold: number;
-  allow_tool_execution: boolean;
-  network_access: NetworkAccess;
   network_allowlist: string[];
   telegram_enabled: boolean;
   telegram_default_instance: string | null;
@@ -106,8 +109,6 @@ export interface SettingsPatch {
   governor_otpm?: number;
   max_concurrent_daemons?: number;
   boredom_threshold?: number;
-  allow_tool_execution?: boolean;
-  network_access?: NetworkAccess;
   network_allowlist?: string[];
   telegram_enabled?: boolean;
   /** null clears, a string sets, omit to leave unchanged. */
@@ -176,6 +177,7 @@ export interface DriftMetrics {
   unanimous_streak: number;
   elect_markers_missing: number;
   elect_window: number;
+  coupling_level: CouplingLevel;
   network_access: NetworkAccess;
   network_allowlist_len: number;
 }
@@ -196,14 +198,18 @@ export const api = {
     name: string,
     routingMode?: RoutingMode,
     phaseRouting?: string,
+    couplingLevel?: CouplingLevel,
     language?: string,
   ) =>
     invoke<Instance>("create_instance", {
       name,
       routingMode,
       phaseRouting: phaseRouting ?? null,
+      couplingLevel: couplingLevel ?? "mirror",
       language: language ?? "en",
     }),
+  setCouplingLevel: (id: string, level: CouplingLevel) =>
+    invoke<{ id: string; coupling_level: CouplingLevel }>("set_coupling_level", { id, level }),
   setInstanceRouting: (
     id: string,
     routingMode: RoutingMode,

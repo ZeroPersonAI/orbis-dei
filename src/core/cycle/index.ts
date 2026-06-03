@@ -15,7 +15,8 @@ import { buildPrompt, inboxIsEmpty } from "../../inference/prompt.ts";
 import { normalizeLang, type Lang } from "../../templates.ts";
 import { AppError } from "../../error.ts";
 import type { CancellationToken } from "../../util/cancel.ts";
-import { parseNetworkAccess, type NetworkAccess } from "./sandbox.ts";
+import { type NetworkAccess } from "./sandbox.ts";
+import { couplingPolicy } from "./coupling.ts";
 import { processExpand } from "./expandIo.ts";
 import { writePhaseFile, phaseFilePath } from "./episodic.ts";
 import * as stateMd from "./stateMd.ts";
@@ -78,7 +79,9 @@ export async function runOneCycle(
   const loopN = stateMd.readCounter(paths.state());
   const inboxWasEmpty = inboxIsEmpty(paths);
   const anchor = pgit.headOid(paths.root);
-  const networkPolicy = parseNetworkAccess(settings.network_access);
+  // Network policy + tool execution come from this instance's coupling level,
+  // not a global toggle.
+  const { networkPolicy, allowToolExecution } = couplingPolicy(instance.coupling_level);
 
   try {
     const phases = await runPhases(
@@ -88,7 +91,7 @@ export async function runOneCycle(
       state,
       loopN,
       cancel,
-      settings.allow_tool_execution,
+      allowToolExecution,
       networkPolicy,
       settings.network_allowlist,
     );

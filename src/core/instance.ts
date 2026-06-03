@@ -8,6 +8,7 @@ import { InstancePaths, createDirs, writeAtomic } from "../persistence/fs.ts";
 import * as pgit from "../persistence/git.ts";
 import * as templates from "../templates.ts";
 import { validateRoutingMode } from "../inference/provider.ts";
+import { type CouplingLevel, normalizeCoupling } from "./cycle/coupling.ts";
 import { AppError, notFound, invalidInput } from "../error.ts";
 
 export interface Instance {
@@ -30,6 +31,8 @@ export interface Instance {
   auto_stimulus_prompt: string | null;
   /** Organism language. Always "en". */
   language: string;
+  /** How strongly this organism is coupled to the world (network + tools). */
+  coupling_level: CouplingLevel;
 }
 
 export const DEFAULT_ROUTING_MODE = "anthropic";
@@ -39,6 +42,7 @@ export function bootstrap(
   name: string,
   routingMode: string,
   language: string,
+  couplingLevel: string,
   instancesDir: string,
 ): Instance {
   const trimmed = name.trim();
@@ -50,6 +54,7 @@ export function bootstrap(
   validateRoutingMode(routing);
 
   const lang = templates.normalizeLang(language);
+  const coupling = normalizeCoupling(couplingLevel);
 
   const id = randomUUID();
   const createdAt = new Date().toISOString();
@@ -102,14 +107,15 @@ export function bootstrap(
     auto_stimulus_interval_minutes: 15,
     auto_stimulus_prompt: null,
     language: lang,
+    coupling_level: coupling,
   };
 }
 
 export function insert(db: DB, inst: Instance): void {
   db.prepare(
     `INSERT INTO instances
-       (id, name, path, created_at, status, loop_counter, routing_mode, phase_routing, language)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+       (id, name, path, created_at, status, loop_counter, routing_mode, phase_routing, language, coupling_level)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
   ).run(
     inst.id,
     inst.name,
@@ -120,6 +126,7 @@ export function insert(db: DB, inst: Instance): void {
     inst.routing_mode,
     inst.phase_routing,
     inst.language,
+    inst.coupling_level,
   );
 }
 
@@ -127,7 +134,7 @@ const COLS = `id, name, path, created_at, status, current_phase,
   loop_counter, last_stimulus_at, routing_mode, phase_routing,
   loops_since_last_stimulus, auto_mode_enabled, auto_reply_enabled,
   auto_reply_prompt, auto_stimulus_enabled,
-  auto_stimulus_interval_minutes, auto_stimulus_prompt, language`;
+  auto_stimulus_interval_minutes, auto_stimulus_prompt, language, coupling_level`;
 
 function rowToInstance(r: any): Instance {
   return {
@@ -149,7 +156,18 @@ function rowToInstance(r: any): Instance {
     auto_stimulus_interval_minutes: r.auto_stimulus_interval_minutes,
     auto_stimulus_prompt: r.auto_stimulus_prompt ?? null,
     language: r.language ?? "en",
+    coupling_level: normalizeCoupling(r.coupling_level),
   };
+}
+
+/** Update an instance's coupling level. Returns the normalized level written. */
+export function setCoupling(db: DB, id: string, level: string): CouplingLevel {
+  const normalized = normalizeCoupling(level);
+  const res = db
+    .prepare(`UPDATE instances SET coupling_level = ? WHERE id = ?`)
+    .run(normalized, id);
+  if (res.changes === 0) throw notFound(`instance ${id}`);
+  return normalized;
 }
 
 export function listAll(db: DB): Instance[] {

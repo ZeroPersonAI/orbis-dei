@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import {
   api,
   ROUTING_MODE_LABELS,
+  type CouplingLevel,
   type Instance,
 } from "../lib/tauri-bindings";
 import { useLoopState } from "../lib/loop-events";
@@ -44,6 +45,12 @@ const STATUS_COLORS: Record<string, string> = {
   paused: "bg-amber-500",
   error: "bg-red-500",
   boredom_pause: "bg-sky-500",
+};
+
+const COUPLING_DOT: Record<CouplingLevel, string> = {
+  mirror: "bg-sky-500",
+  gated: "bg-amber-500",
+  open: "bg-red-500",
 };
 
 export function InstanceView({ instanceId, onBack }: Props) {
@@ -135,6 +142,19 @@ export function InstanceView({ instanceId, onBack }: Props) {
     }
   }
 
+  async function handleSetCoupling(level: CouplingLevel) {
+    setBusy(true);
+    setError(null);
+    try {
+      await api.setCouplingLevel(instanceId, level);
+      await refreshInstance();
+    } catch (e) {
+      setError(String(e));
+    } finally {
+      setBusy(false);
+    }
+  }
+
   const dotClass =
     STATUS_COLORS[isRunning ? "running" : instance?.status ?? "idle"] ??
     "bg-neutral-600";
@@ -162,6 +182,23 @@ export function InstanceView({ instanceId, onBack }: Props) {
                 instance.routing_mode)
               : ""}
           </span>
+
+          {instance && (
+            <label className="flex items-center gap-1.5 text-xs text-neutral-500">
+              <span className={`w-1.5 h-1.5 rounded-full ${COUPLING_DOT[instance.coupling_level]}`} />
+              <select
+                value={instance.coupling_level}
+                disabled={busy}
+                onChange={(e) => handleSetCoupling(e.target.value as CouplingLevel)}
+                title={t("Coupling: network + tool access for this organism")}
+                className="bg-neutral-900 text-neutral-300 text-xs rounded border border-neutral-800 px-1.5 py-0.5 focus:outline-none focus:border-neutral-600 disabled:opacity-50"
+              >
+                <option value="mirror">{t("Mirror")}</option>
+                <option value="gated">{t("Gated")}</option>
+                <option value="open">{t("Open")}</option>
+              </select>
+            </label>
+          )}
 
           <div className="ml-auto flex gap-2">
             {daemon.running ? (

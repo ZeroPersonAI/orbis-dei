@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import {
   api,
+  type CouplingLevel,
   type Instance,
   type RoutingMode,
 } from "../lib/tauri-bindings";
@@ -50,9 +51,10 @@ export function HabitatView({ onOpenSettings, onOpenInstance }: Props) {
     name: string,
     routingMode: RoutingMode,
     phaseRouting: string | undefined,
+    couplingLevel: CouplingLevel,
   ) {
     try {
-      await api.createInstance(name, routingMode, phaseRouting);
+      await api.createInstance(name, routingMode, phaseRouting, couplingLevel);
       setShowNew(false);
       await refresh();
     } catch (e) {

@@ -88,6 +88,25 @@ export function migrate(db: DB): void {
     db.exec("ALTER TABLE instances ADD COLUMN language TEXT NOT NULL DEFAULT 'en'");
   }
 
+  // Per-instance coupling level (mirror/gated/open) replaces the old global
+  // network_access + allow_tool_execution toggles. New instances default to the
+  // safe (closed) "mirror". Existing instances are backfilled from the old
+  // global settings so current behavior is preserved: an instance only becomes
+  // coupled if the habitat previously had BOTH network access and tools on.
+  if (!cols.includes("coupling_level")) {
+    db.exec("ALTER TABLE instances ADD COLUMN coupling_level TEXT NOT NULL DEFAULT 'mirror'");
+    const getVal = (k: string): string | null => {
+      const row = db.prepare("SELECT value FROM settings WHERE key = ?").get(k) as
+        | { value: string }
+        | undefined;
+      return row?.value ?? null;
+    };
+    const net = getVal("network_access");
+    const tools = getVal("allow_tool_execution") === "true";
+    const level = tools && net === "open" ? "open" : tools && net === "gated" ? "gated" : "mirror";
+    db.prepare("UPDATE instances SET coupling_level = ?").run(level);
+  }
+
   // Drop the legacy cost_usd column from databases created before cost tracking
   // was removed. Token counts are kept; only the money figure is gone. This is
   // best-effort cleanup: inserts already omit cost_usd, so a leftover (nullable)

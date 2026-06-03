@@ -94,8 +94,6 @@ export function SettingsView({ onBack }: Props) {
         governor_otpm: settings.governor_otpm,
         max_concurrent_daemons: settings.max_concurrent_daemons,
         boredom_threshold: settings.boredom_threshold,
-        allow_tool_execution: settings.allow_tool_execution,
-        network_access: settings.network_access,
         network_allowlist: settings.network_allowlist,
         telegram_enabled: settings.telegram_enabled,
         telegram_default_instance: settings.telegram_default_instance,
@@ -495,91 +493,30 @@ export function SettingsView({ onBack }: Props) {
                 />
               </div>
 
-              <div>
-                <label className="flex items-center gap-2 text-xs text-neutral-400">
-                  <input
-                    type="checkbox"
-                    checked={settings.allow_tool_execution}
-                    onChange={(e) =>
-                      setSettings({
-                        ...settings,
-                        allow_tool_execution: e.target.checked,
-                      })
-                    }
-                    className="accent-red-400"
-                  />
-                  {t("Allow tool execution in the Expand phase")}
-                </label>
-                <p className="text-[10px] text-amber-500/80 mt-1 leading-relaxed">
-                  {t(
-                    "Runs model-generated shell scripts in a macOS sandbox-exec jail — network denied (unless changed below), writes confined to the instance directory, 30s timeout. Residual risk remains; a determined exploit could still find gaps. When off, tools are still written to disk but not executed.",
-                  )}
-                </p>
-              </div>
-
               <div className="space-y-2 border-t border-neutral-800 pt-4">
                 <label className="block text-xs text-neutral-400 mb-1.5">
-                  {t("Network access (sandbox firewall)")}
+                  {t("Gated-coupling allowlist (one hostname per line, no scheme, no path)")}
                 </label>
-                <select
-                  value={settings.network_access}
+                <textarea
+                  value={settings.network_allowlist.join("\n")}
                   onChange={(e) =>
                     setSettings({
                       ...settings,
-                      network_access: e.target.value as
-                        | "off"
-                        | "gated"
-                        | "open",
+                      network_allowlist: e.target.value
+                        .split("\n")
+                        .map((s) => s.trim())
+                        .filter((s) => s.length > 0),
                     })
                   }
-                  className="w-full bg-neutral-800 text-neutral-200 text-xs rounded px-2 py-1.5 border border-neutral-700"
-                >
-                  <option value="off">{t("off — fully isolated (default)")}</option>
-                  <option value="gated">
-                    {t("gated — TCP 80/443 to allowlisted hosts")}
-                  </option>
-                  <option value="open">
-                    {t("open — sandbox firewall disabled, all network allowed")}
-                  </option>
-                </select>
-
-                {settings.network_access === "gated" && (
-                  <div>
-                    <label className="block text-[10px] text-neutral-500 mb-1">
-                      {t("Allowlist (one hostname per line, no scheme, no path)")}
-                    </label>
-                    <textarea
-                      value={settings.network_allowlist.join("\n")}
-                      onChange={(e) =>
-                        setSettings({
-                          ...settings,
-                          network_allowlist: e.target.value
-                            .split("\n")
-                            .map((s) => s.trim())
-                            .filter((s) => s.length > 0),
-                        })
-                      }
-                      rows={4}
-                      placeholder={"wikipedia.org\narxiv.org"}
-                      className="w-full bg-neutral-800 text-neutral-200 text-xs rounded px-2 py-1.5 border border-neutral-700 placeholder-neutral-600 font-mono"
-                    />
-                  </div>
-                )}
-
-                {settings.network_access === "open" && (
-                  <p className="text-[10px] text-red-400/90 leading-relaxed">
-                    {t(
-                      "Open mode bypasses the sandbox firewall entirely. The InstanceView shows a red banner each loop and an SP-I warning is appended to every review file while this is active — use it for explicit exploration, not as a default.",
-                    )}
-                  </p>
-                )}
-                {settings.network_access === "gated" && (
-                  <p className="text-[10px] text-amber-400/80 leading-relaxed">
-                    {t(
-                      "Tools can reach the allowlisted hosts on http/https. DNS is open. Per-tool approval is deferred — the allowlist is the primary defense.",
-                    )}
-                  </p>
-                )}
+                  rows={4}
+                  placeholder={"wikipedia.org\narxiv.org"}
+                  className="w-full bg-neutral-800 text-neutral-200 text-xs rounded px-2 py-1.5 border border-neutral-700 placeholder-neutral-600 font-mono"
+                />
+                <p className="text-[10px] text-neutral-600 leading-relaxed">
+                  {t(
+                    "Network access and tool execution are now set per instance, via the Coupling control on each instance. This shared allowlist defines which hosts an instance in Gated coupling may reach on TCP 80/443 (Open coupling bypasses it). Tools always run sandboxed: writes confined to the instance directory, 30s timeout.",
+                  )}
+                </p>
               </div>
             </section>
 

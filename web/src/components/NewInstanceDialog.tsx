@@ -1,10 +1,12 @@
 import { useEffect, useState, type FormEvent } from "react";
 import {
   api,
+  type CouplingLevel,
   type Provider,
   type RoutingMode,
 } from "../lib/tauri-bindings";
 import { RoutingEditor, parsePhaseMap } from "./RoutingEditor";
+import { CouplingEditor } from "./CouplingEditor";
 import { useT } from "../lib/i18n";
 
 interface Props {
@@ -13,12 +15,14 @@ interface Props {
     name: string,
     routingMode: RoutingMode,
     phaseRouting: string | undefined,
+    couplingLevel: CouplingLevel,
   ) => Promise<void>;
 }
 
 export function NewInstanceDialog({ onCancel, onConfirm }: Props) {
   const { t } = useT();
   const [name, setName] = useState("");
+  const [coupling, setCoupling] = useState<CouplingLevel>("mirror");
   const [routing, setRouting] = useState<RoutingMode>("anthropic");
   const [phaseMap, setPhaseMap] = useState<Record<string, Provider>>(
     parsePhaseMap(null),
@@ -45,7 +49,7 @@ export function NewInstanceDialog({ onCancel, onConfirm }: Props) {
     try {
       const phaseRouting =
         routing === "custom" ? JSON.stringify(phaseMap) : undefined;
-      await onConfirm(name.trim(), routing, phaseRouting);
+      await onConfirm(name.trim(), routing, phaseRouting, coupling);
     } finally {
       setSubmitting(false);
     }
@@ -92,6 +96,10 @@ export function NewInstanceDialog({ onCancel, onConfirm }: Props) {
             "Provider + model (from settings) per loop phase. The required API key must be set in settings.",
           )}
         </p>
+
+        <div className="mt-5">
+          <CouplingEditor level={coupling} onChange={setCoupling} />
+        </div>
 
         <div className="mt-6 flex justify-end gap-2">
           <button
