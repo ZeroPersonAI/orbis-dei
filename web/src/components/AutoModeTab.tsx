@@ -223,9 +223,9 @@ export function AutoModeTab({ instanceId }: Props) {
       <p className="text-[11px] text-neutral-600 border-t border-neutral-900 pt-3">
         {t(
           "Generation runs through this instance's routing (strong model under " +
-            "Hybrid) and through the Governor (budget/rate limits apply). Auto mode " +
-            "is independent of the loop daemon: stimuli accumulate even when the " +
-            "instance is paused.",
+            "Hybrid) and through the Governor (rate limits apply). Auto mode stays " +
+            "armed but dormant while the instance is paused — it only injects while " +
+            "the loop is running.",
         )}
       </p>
     </div>

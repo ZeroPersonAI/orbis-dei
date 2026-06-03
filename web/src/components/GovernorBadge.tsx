@@ -37,32 +37,8 @@ export function GovernorBadge({ refreshKey = 0 }: Props) {
   }
   if (!status) return null;
 
-  const pct =
-    status.daily_budget_usd > 0
-      ? (status.daily_spent_usd / status.daily_budget_usd) * 100
-      : 0;
-
-  const budgetClass =
-    pct >= 95
-      ? "text-red-300 border-red-700"
-      : pct >= 75
-        ? "text-amber-300 border-amber-700"
-        : "text-neutral-300 border-neutral-700";
-
   return (
     <div className="flex items-center gap-3 text-[11px]">
-      <span
-        className={`px-2 py-0.5 border rounded font-mono ${budgetClass}`}
-        title={t("monthly: ${spent} / ${budget}", {
-          spent: status.monthly_spent_usd.toFixed(2),
-          budget: status.monthly_budget_usd.toFixed(2),
-        })}
-      >
-        ${status.daily_spent_usd.toFixed(2)} / $
-        {status.daily_budget_usd.toFixed(2)}
-        <span className="text-neutral-500 ml-1">({pct.toFixed(0)}%)</span>
-      </span>
-
       {status.queue_depth > 0 && (
         <span
           className="px-2 py-0.5 border border-sky-700 text-sky-300 rounded"

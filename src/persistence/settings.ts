@@ -13,9 +13,6 @@ export interface Settings {
   governor_rpm: number;
   governor_itpm: number;
   governor_otpm: number;
-  daily_budget_usd: number;
-  monthly_budget_usd: number;
-  per_instance_quota_pct: number | null;
   max_concurrent_daemons: number;
   boredom_threshold: number;
   allow_tool_execution: boolean;
@@ -27,8 +24,8 @@ export interface Settings {
   telegram_allow_stimulus_inject: boolean;
 }
 
-// Patch: a key being absent = leave unchanged. `per_instance_quota_pct` and
-// `telegram_default_instance` accept null to clear.
+// Patch: a key being absent = leave unchanged. `telegram_default_instance`
+// accepts null to clear.
 export type SettingsPatch = Partial<{
   anthropic_model: string;
   anthropic_base_url: string;
@@ -40,9 +37,6 @@ export type SettingsPatch = Partial<{
   governor_rpm: number;
   governor_itpm: number;
   governor_otpm: number;
-  daily_budget_usd: number;
-  monthly_budget_usd: number;
-  per_instance_quota_pct: number | null;
   max_concurrent_daemons: number;
   boredom_threshold: number;
   allow_tool_execution: boolean;
@@ -65,9 +59,6 @@ const K = {
   GOV_RPM: "governor_rpm",
   GOV_ITPM: "governor_itpm",
   GOV_OTPM: "governor_otpm",
-  DAILY_BUDGET: "daily_budget_usd",
-  MONTHLY_BUDGET: "monthly_budget_usd",
-  PER_INSTANCE_QUOTA: "per_instance_quota_pct",
   MAX_CONCURRENT_DAEMONS: "max_concurrent_daemons",
   BOREDOM_THRESHOLD: "boredom_threshold",
   ALLOW_TOOL_EXECUTION: "allow_tool_execution",
@@ -91,9 +82,6 @@ export function defaultSettings(): Settings {
     governor_rpm: 50,
     governor_itpm: 30_000,
     governor_otpm: 8_000,
-    daily_budget_usd: 5.0,
-    monthly_budget_usd: 50.0,
-    per_instance_quota_pct: null,
     max_concurrent_daemons: 3,
     boredom_threshold: 50,
     allow_tool_execution: false,
@@ -143,7 +131,6 @@ const list = (db: DB, key: string): string[] => {
 
 export function loadSettings(db: DB): Settings {
   const d = defaultSettings();
-  const quotaRaw = getRaw(db, K.PER_INSTANCE_QUOTA);
   const tgDefaultRaw = getRaw(db, K.TELEGRAM_DEFAULT_INSTANCE);
   return {
     anthropic_model: str(db, K.ANTHROPIC_MODEL, d.anthropic_model),
@@ -156,10 +143,6 @@ export function loadSettings(db: DB): Settings {
     governor_rpm: num(db, K.GOV_RPM, d.governor_rpm),
     governor_itpm: num(db, K.GOV_ITPM, d.governor_itpm),
     governor_otpm: num(db, K.GOV_OTPM, d.governor_otpm),
-    daily_budget_usd: num(db, K.DAILY_BUDGET, d.daily_budget_usd),
-    monthly_budget_usd: num(db, K.MONTHLY_BUDGET, d.monthly_budget_usd),
-    per_instance_quota_pct:
-      quotaRaw === null ? null : Number.isFinite(Number(quotaRaw)) ? Number(quotaRaw) : null,
     max_concurrent_daemons: num(db, K.MAX_CONCURRENT_DAEMONS, d.max_concurrent_daemons),
     boredom_threshold: num(db, K.BOREDOM_THRESHOLD, d.boredom_threshold),
     allow_tool_execution: bool(db, K.ALLOW_TOOL_EXECUTION, d.allow_tool_execution),
@@ -204,13 +187,6 @@ export function applyPatch(db: DB, patch: SettingsPatch): void {
   if (has("governor_rpm")) setRaw(db, K.GOV_RPM, String(patch.governor_rpm));
   if (has("governor_itpm")) setRaw(db, K.GOV_ITPM, String(patch.governor_itpm));
   if (has("governor_otpm")) setRaw(db, K.GOV_OTPM, String(patch.governor_otpm));
-  if (has("daily_budget_usd")) setRaw(db, K.DAILY_BUDGET, String(patch.daily_budget_usd));
-  if (has("monthly_budget_usd")) setRaw(db, K.MONTHLY_BUDGET, String(patch.monthly_budget_usd));
-  if (has("per_instance_quota_pct")) {
-    const v = patch.per_instance_quota_pct;
-    if (v === null || v === undefined) delRaw(db, K.PER_INSTANCE_QUOTA);
-    else setRaw(db, K.PER_INSTANCE_QUOTA, String(v));
-  }
   if (has("max_concurrent_daemons"))
     setRaw(db, K.MAX_CONCURRENT_DAEMONS, String(patch.max_concurrent_daemons));
   if (has("boredom_threshold")) setRaw(db, K.BOREDOM_THRESHOLD, String(patch.boredom_threshold));

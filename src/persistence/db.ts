@@ -59,7 +59,6 @@ export function migrate(db: DB): void {
         model          TEXT NOT NULL,
         input_tokens   INTEGER,
         output_tokens  INTEGER,
-        cost_usd       REAL,
         latency_ms     INTEGER,
         rate_limited   INTEGER NOT NULL DEFAULT 0,
         queue_wait_ms  INTEGER,
@@ -87,5 +86,14 @@ export function migrate(db: DB): void {
   );
   if (!cols.includes("language")) {
     db.exec("ALTER TABLE instances ADD COLUMN language TEXT NOT NULL DEFAULT 'en'");
+  }
+
+  // Drop the legacy cost_usd column from databases created before cost tracking
+  // was removed. Token counts are kept; only the money figure is gone.
+  const icCols = (
+    db.prepare("PRAGMA table_info(inference_calls)").all() as { name: string }[]
+  ).map((c) => c.name);
+  if (icCols.includes("cost_usd")) {
+    db.exec("ALTER TABLE inference_calls DROP COLUMN cost_usd");
   }
 }

@@ -31,8 +31,6 @@ const STATUS_COLORS: Record<string, string> = {
   paused: "bg-amber-500 text-amber-950",
   error: "bg-red-500 text-red-50",
   boredom_pause: "bg-sky-500 text-sky-950",
-  budget_pause: "bg-orange-500 text-orange-950",
-  quota_pause: "bg-orange-500 text-orange-950",
 };
 
 const NETWORK_BADGE: Record<string, string> = {

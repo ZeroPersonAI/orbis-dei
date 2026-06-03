@@ -22,6 +22,14 @@ yet tag releases.
 - Global `unhandledRejection` / `uncaughtException` handlers so a background
   daemon or auto-mode error logs a stack trace instead of silently exiting.
 
+### Removed
+- Cost / budget tracking. The dollar-spend badge, the daily/monthly budget and
+  per-instance quota settings, the pre-flight budget refusals, the per-model
+  pricing table, and the `inference_calls.cost_usd` column are all gone (an
+  automatic migration drops the column from existing databases). The governor
+  keeps its rate-limit buckets (RPM/ITPM/OTPM) and circuit breaker, and
+  per-call token counts are still recorded — only the money figures were removed.
+
 ### Changed
 - The project is English-only — UI, organism constitution and loop prompts, and
   all generated text. (Earlier exploratory multilingual support was removed.)

@@ -11,7 +11,6 @@ import { InstancePaths } from "../persistence/fs.ts";
 import { loadSettings, applyPatch, type SettingsPatch } from "../persistence/settings.ts";
 import { validateRoutingMode } from "../inference/provider.ts";
 import { AnthropicClient } from "../inference/anthropic.ts";
-import * as budget from "../inference/governor/budget.ts";
 import type { GovernorSettings } from "../inference/governor/index.ts";
 import { runOneCycle } from "../core/cycle/index.ts";
 import { readCounter } from "../core/cycle/stateMd.ts";
@@ -79,9 +78,6 @@ export function buildCommands(state: AppState): Record<string, CommandHandler> {
       rpm: s.governor_rpm,
       itpm: s.governor_itpm,
       otpm: s.governor_otpm,
-      dailyBudgetUsd: s.daily_budget_usd,
-      monthlyBudgetUsd: s.monthly_budget_usd,
-      perInstanceQuotaPct: s.per_instance_quota_pct,
     };
     void state.governor.reconfigure(g);
   };
@@ -187,13 +183,8 @@ export function buildCommands(state: AppState): Record<string, CommandHandler> {
       return loadSettings(state.db);
     },
     get_governor_status: async () => {
-      const s = loadSettings(state.db);
       const [open, reopenSecs] = await state.governor.breakerStatus();
       return {
-        daily_spent_usd: budget.todaySpentUsd(state.db),
-        daily_budget_usd: s.daily_budget_usd,
-        monthly_spent_usd: budget.monthSpentUsd(state.db),
-        monthly_budget_usd: s.monthly_budget_usd,
         queue_depth: await state.governor.queueDepth(),
         breaker_open: open,
         breaker_reopens_in_secs: reopenSecs,

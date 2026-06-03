@@ -82,9 +82,6 @@ export interface Settings {
   governor_rpm: number;
   governor_itpm: number;
   governor_otpm: number;
-  daily_budget_usd: number;
-  monthly_budget_usd: number;
-  per_instance_quota_pct: number | null;
   max_concurrent_daemons: number;
   boredom_threshold: number;
   allow_tool_execution: boolean;
@@ -107,10 +104,6 @@ export interface SettingsPatch {
   governor_rpm?: number;
   governor_itpm?: number;
   governor_otpm?: number;
-  daily_budget_usd?: number;
-  monthly_budget_usd?: number;
-  /** null clears the quota, a number sets it. Omit to leave unchanged. */
-  per_instance_quota_pct?: number | null;
   max_concurrent_daemons?: number;
   boredom_threshold?: number;
   allow_tool_execution?: boolean;
@@ -124,10 +117,6 @@ export interface SettingsPatch {
 }
 
 export interface GovernorStatus {
-  daily_spent_usd: number;
-  daily_budget_usd: number;
-  monthly_spent_usd: number;
-  monthly_budget_usd: number;
   queue_depth: number;
   breaker_open: boolean;
   breaker_reopens_in_secs: number | null;

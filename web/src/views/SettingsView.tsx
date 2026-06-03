@@ -27,7 +27,6 @@ export function SettingsView({ onBack }: Props) {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
-  const [quotaEnabled, setQuotaEnabled] = useState(false);
 
   useEffect(() => {
     refresh();
@@ -49,7 +48,6 @@ export function SettingsView({ onBack }: Props) {
       setHasGemini(gm);
       setHasTelegram(t);
       setInstances(inst);
-      setQuotaEnabled(s.per_instance_quota_pct !== null);
     } catch (e) {
       setError(String(e));
     }
@@ -94,11 +92,6 @@ export function SettingsView({ onBack }: Props) {
         governor_rpm: settings.governor_rpm,
         governor_itpm: settings.governor_itpm,
         governor_otpm: settings.governor_otpm,
-        daily_budget_usd: settings.daily_budget_usd,
-        monthly_budget_usd: settings.monthly_budget_usd,
-        per_instance_quota_pct: quotaEnabled
-          ? (settings.per_instance_quota_pct ?? 25)
-          : null,
         max_concurrent_daemons: settings.max_concurrent_daemons,
         boredom_threshold: settings.boredom_threshold,
         allow_tool_execution: settings.allow_tool_execution,
@@ -110,7 +103,6 @@ export function SettingsView({ onBack }: Props) {
         telegram_allow_stimulus_inject: settings.telegram_allow_stimulus_inject,
       });
       setSettings(updated);
-      setQuotaEnabled(updated.per_instance_quota_pct !== null);
       setNotice(t("Settings saved."));
     } catch (e) {
       setError(String(e));
@@ -446,7 +438,7 @@ export function SettingsView({ onBack }: Props) {
             {/* Governor */}
             <section className="space-y-5 mb-10">
               <h2 className="text-sm font-medium text-neutral-300">
-                {t("Governor — rate limits & budgets")}
+                {t("Governor — rate limits")}
               </h2>
               <p className="text-xs text-neutral-500">
                 {t(
@@ -476,49 +468,6 @@ export function SettingsView({ onBack }: Props) {
                     setSettings({ ...settings, governor_otpm: v })
                   }
                 />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <FloatField
-                  label={t("Daily budget (USD)")}
-                  value={settings.daily_budget_usd}
-                  onChange={(v) =>
-                    setSettings({ ...settings, daily_budget_usd: v })
-                  }
-                />
-                <FloatField
-                  label={t("Monthly budget (USD)")}
-                  value={settings.monthly_budget_usd}
-                  onChange={(v) =>
-                    setSettings({ ...settings, monthly_budget_usd: v })
-                  }
-                />
-              </div>
-
-              <div>
-                <label className="flex items-center gap-2 text-xs text-neutral-400 mb-1.5">
-                  <input
-                    type="checkbox"
-                    checked={quotaEnabled}
-                    onChange={(e) => setQuotaEnabled(e.target.checked)}
-                    className="accent-neutral-300"
-                  />
-                  {t("Per-instance quota (% of daily budget)")}
-                </label>
-                {quotaEnabled && (
-                  <FloatField
-                    label=""
-                    value={settings.per_instance_quota_pct ?? 25}
-                    onChange={(v) =>
-                      setSettings({ ...settings, per_instance_quota_pct: v })
-                    }
-                  />
-                )}
-                <p className="text-[10px] text-neutral-600 mt-1">
-                  {t(
-                    "When enabled, no single instance may consume more than this percentage of the daily budget before being parked.",
-                  )}
-                </p>
               </div>
             </section>
 
@@ -841,32 +790,6 @@ function NumberField({
         step={1}
         value={value}
         onChange={(e) => onChange(parseInt(e.target.value, 10) || 0)}
-        className="w-full bg-neutral-950 border border-neutral-800 rounded px-3 py-2 text-sm font-mono focus:outline-none focus:border-neutral-600"
-      />
-    </div>
-  );
-}
-
-function FloatField({
-  label,
-  value,
-  onChange,
-}: {
-  label: string;
-  value: number;
-  onChange: (v: number) => void;
-}) {
-  return (
-    <div>
-      {label && (
-        <label className="block text-xs text-neutral-400 mb-1.5">{label}</label>
-      )}
-      <input
-        type="number"
-        min={0}
-        step={0.01}
-        value={value}
-        onChange={(e) => onChange(parseFloat(e.target.value) || 0)}
         className="w-full bg-neutral-950 border border-neutral-800 rounded px-3 py-2 text-sm font-mono focus:outline-none focus:border-neutral-600"
       />
     </div>

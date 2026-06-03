@@ -58,9 +58,6 @@ export class AppState {
       rpm: s.governor_rpm,
       itpm: s.governor_itpm,
       otpm: s.governor_otpm,
-      dailyBudgetUsd: s.daily_budget_usd,
-      monthlyBudgetUsd: s.monthly_budget_usd,
-      perInstanceQuotaPct: s.per_instance_quota_pct,
     };
     this.governor = new Governor(govSettings);
 

@@ -22,8 +22,6 @@ const STATUS_COLORS: Record<string, string> = {
   paused: "bg-amber-500",
   error: "bg-red-500",
   boredom_pause: "bg-sky-500",
-  budget_pause: "bg-orange-500",
-  quota_pause: "bg-orange-500",
 };
 
 const STOP_REASON_LABEL: Record<string, string> = {
