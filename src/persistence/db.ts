@@ -89,11 +89,20 @@ export function migrate(db: DB): void {
   }
 
   // Drop the legacy cost_usd column from databases created before cost tracking
-  // was removed. Token counts are kept; only the money figure is gone.
+  // was removed. Token counts are kept; only the money figure is gone. This is
+  // best-effort cleanup: inserts already omit cost_usd, so a leftover (nullable)
+  // column is harmless — a failed DROP (old SQLite, etc.) must not block startup.
   const icCols = (
     db.prepare("PRAGMA table_info(inference_calls)").all() as { name: string }[]
   ).map((c) => c.name);
   if (icCols.includes("cost_usd")) {
-    db.exec("ALTER TABLE inference_calls DROP COLUMN cost_usd");
+    try {
+      db.exec("ALTER TABLE inference_calls DROP COLUMN cost_usd");
+    } catch (e) {
+      console.warn(
+        "could not drop legacy cost_usd column (harmless, leaving it):",
+        e instanceof Error ? e.message : e,
+      );
+    }
   }
 }

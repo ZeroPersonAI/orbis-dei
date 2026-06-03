@@ -52,10 +52,8 @@ export class Governor {
   private buckets: Buckets;
   private breaker = new Breaker();
   private queue = new Queue();
-  private settings: GovernorSettings;
 
   constructor(settings: GovernorSettings) {
-    this.settings = settings;
     this.buckets = new Buckets({ rpm: settings.rpm, itpm: settings.itpm, otpm: settings.otpm });
   }
 
@@ -65,7 +63,6 @@ export class Governor {
       itpm: newSettings.itpm,
       otpm: newSettings.otpm,
     });
-    this.settings = newSettings;
   }
 
   /**
