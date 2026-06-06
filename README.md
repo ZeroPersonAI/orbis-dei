@@ -16,7 +16,7 @@ Orbis Dei is an attempt to make this mechanism tangible. It simulates an organis
 
 But it also poses the hardest question rather than evading it: can a computational system be autopoietic at all? Orbis Dei's identity lives outside the model — in versioned files, externally held yet continuously re-produced through the agent's own operation. Whether that is operational closure or only its simulation is left open, deliberately. Orbis Dei is neither product nor demonstration. It is an experimental space — the place where the abstract conditions of autonomy (closure, reactivity, self-maintenance, learning) are not described, but observed.
 
-![Anatomy: each folder of the organism mapped to a biological role](docs/figures/02-anatomy.png)
+![Anatomy: each folder of the organism mapped to a biological role](docs/figures/01-metabolic-loop.png)
 *The filesystem is the body — and every part of it has a biological role.*
 
 ---
