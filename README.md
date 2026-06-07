@@ -68,6 +68,10 @@ npm start              # http://localhost:1421
 Then open <http://localhost:1421>, go to Settings, add an Anthropic (or OpenAI /
 Gemini) API key, create an instance, and press Play.
 
+New here? **[QUICKSTART.md](QUICKSTART.md)** walks you through setting up an
+instance in observation mode — coupling, the gated allowlist, auto-stimulus, and
+the tabs to watch the organism learn.
+
 ### Development
 
 ```bash
