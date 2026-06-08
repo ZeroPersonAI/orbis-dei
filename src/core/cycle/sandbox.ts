@@ -7,7 +7,7 @@
 
 import * as fs from "node:fs";
 import * as path from "node:path";
-import { spawn } from "node:child_process";
+import { spawn, type ChildProcess } from "node:child_process";
 
 import { AppError } from "../../error.ts";
 
@@ -97,9 +97,16 @@ export async function runSandboxed(
   }
 
   return await new Promise<ToolRunResult>((resolve, reject) => {
+    // `detached: true` makes the child its own process-group leader (pgid ===
+    // child.pid). That lets the timeout kill the WHOLE tree — sandbox-exec, the
+    // shell it spawns, and any grandchildren — via a single group signal.
+    // Killing only `child` (the sandbox-exec parent) would orphan the shell,
+    // which then keeps running past the timeout. The own group is also what
+    // makes the negative-pid kill safe: it can never reach the server's group.
     const child = spawn(SANDBOX_EXEC, args, {
       cwd: instanceDir,
       stdio: ["ignore", "pipe", "pipe"],
+      detached: true,
     });
 
     const stdoutChunks: Buffer[] = [];
@@ -109,7 +116,7 @@ export async function runSandboxed(
 
     const timer = setTimeout(() => {
       timedOut = true;
-      child.kill("SIGKILL");
+      killTree(child);
       if (!settled) {
         settled = true;
         resolve({
@@ -192,6 +199,28 @@ function buildProfile(
   lines.push('(allow file-write* (subpath "/private/var/tmp"))');
   lines.push('(allow file-write* (subpath "/dev"))');
   return lines.join("\n");
+}
+
+/**
+ * SIGKILL the child's entire process group, so a timed-out tool can't leave
+ * orphaned grandchildren (the shell, curl, …) running past the timeout. The
+ * child was spawned `detached`, so its pgid equals its pid and the negative-pid
+ * signal stays scoped to that group — never the server's. Falls back to a plain
+ * child kill if the group send fails (e.g. the group is already gone).
+ */
+function killTree(child: ChildProcess): void {
+  const pid = child.pid;
+  if (pid === undefined) return;
+  try {
+    process.kill(-pid, "SIGKILL");
+  } catch {
+    // Group already reaped, or no permission — best-effort fall back.
+    try {
+      child.kill("SIGKILL");
+    } catch {
+      // nothing left to kill
+    }
+  }
 }
 
 /** Add the executable bit so a shebang script can be run directly. */
